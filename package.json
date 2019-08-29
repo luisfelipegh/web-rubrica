@@ -11,8 +11,9 @@
     "generate": "nuxt generate"
   },
   "dependencies": {
+    "@nuxtjs/axios": "^5.3.6",
     "nuxt": "^2.6.2",
-    "@nuxtjs/axios": "^5.3.6"
+    "vue-cookie": "^1.1.4"
   },
   "devDependencies": {
     "@nuxtjs/vuetify": "^1.5",

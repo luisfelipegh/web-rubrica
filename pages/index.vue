@@ -1,92 +1,98 @@
 <template>
-  <v-layout
-    column
-    justify-center
-    align-center
-  >
-    <v-flex
-      xs12
-      sm8
-      md6
-    >
-      <div class="text-center">
-        <logo />
-        <vuetify-logo />
-      </div>
-      <v-card>
-        <v-card-title class="headline">
-          Welcome to the Vuetify + Nuxt.js template
-        </v-card-title>
-        <v-card-text>
-          <p>Vuetify is a progressive Material Design component framework for Vue.js. It was designed to empower developers to create amazing applications.</p>
-          <p>
-            For more information on Vuetify, check out the <a
-              href="https://vuetifyjs.com"
-              target="_blank"
-            >
-              documentation
-            </a>.
-          </p>
-          <p>
-            If you have questions, please join the official <a
-              href="https://chat.vuetifyjs.com/"
-              target="_blank"
-              title="chat"
-            >
-              discord
-            </a>.
-          </p>
-          <p>
-            Find a bug? Report it on the github <a
-              href="https://github.com/vuetifyjs/vuetify/issues"
-              target="_blank"
-              title="contribute"
-            >
-              issue board
-            </a>.
-          </p>
-          <p>Thank you for developing with Vuetify and I look forward to bringing more exciting features in the future.</p>
-          <div class="text-xs-right">
-            <em><small>&mdash; John Leider</small></em>
-          </div>
-          <hr class="my-3">
-          <a
-            href="https://nuxtjs.org/"
-            target="_blank"
+  <v-app id="inspire">
+    <v-content>
+      <loading :dialog="loading"></loading>
+      <v-container
+        class="fill-height"
+        fluid
+      >
+        <v-row
+          align="center"
+          justify="center"
+        >
+          <v-col
+            cols="12"
+            sm="8"
+            md="4"
           >
-            Nuxt Documentation
-          </a>
-          <br>
-          <a
-            href="https://github.com/nuxt/nuxt.js"
-            target="_blank"
-          >
-            Nuxt GitHub
-          </a>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            color="primary"
-            nuxt
-            to="/inspire"
-          >
-            Continue
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-flex>
-  </v-layout>
+            <v-card class="elevation-12">
+              <v-toolbar
+                dark
+              >
+                  <h3>
+                  Rúbrica de Evaluación
+                  </h3>
+                  <v-spacer></v-spacer>
+                  <img src="@/static/img/company_logo.png" width="130" />
+              </v-toolbar>
+              <v-card-text>
+                <v-form>
+                  <v-text-field
+                     v-model="currentData.email"
+                    label="Correo"
+                    name="login"
+                    :rules="[rules.required, rules.email]"
+                    prepend-icon="person"
+                    type="text"
+                  ></v-text-field>
+                  <v-text-field
+                     v-model="currentData.password"
+                    label="Contraseña"
+                    name="password"
+                    prepend-icon="lock"
+                    type="password"
+                  ></v-text-field>
+                </v-form>
+              </v-card-text>
+                 <v-progress-linear :v-if="loading" indeterminate color="white" class="mb-0"></v-progress-linear>
+
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="primary" rounded @click="login()" >Ingresar</v-btn>
+                <v-spacer></v-spacer>
+              </v-card-actions>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-content>
+  </v-app>
 </template>
-
 <script>
-import Logo from '~/components/Logo.vue'
-import VuetifyLogo from '~/components/VuetifyLogo.vue'
-
+import loading from '@/components/loading.vue'
+import config from '@/assets/js/config'
+import routes from '@/assets/js/routes'
+import { mapMutations } from 'vuex'
 export default {
-  components: {
-    Logo,
-    VuetifyLogo
+  layout:'blank',
+  components: { loading
+  },
+  beforeMount() {},
+  data(){
+    return{
+      config:config,
+    currentData: {},
+    loading: false,
+    message: '',
+    user: {},
+    useruid: '',
+    rules:{ email: value => {
+            const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+            return pattern.test(value) || 'Correo Inválido'
+          }
+        }
+    }
+  },
+  methods: {
+    login() {
+     this.loading=true
+     this.$router.push(routes.home)
+    this.loading=false
+     console.log(this.currentData);
+    }
   }
 }
 </script>
+<style>
+
+</style>

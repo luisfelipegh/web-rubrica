@@ -23,6 +23,7 @@
           </v-list-item-content>
         </v-list-item>
       </v-list>
+
     </v-navigation-drawer>
     
     <v-app-bar
@@ -31,58 +32,44 @@
       app
     >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
-      <v-btn
-        icon
-        @click.stop="miniVariant = !miniVariant"
-      >
-      <v-icon>mdi-{{ `chevron-${miniVariant ? 'right' : 'left'}` }}</v-icon>
-      </v-btn>
-      <v-btn
-        icon
-        @click.stop="fixed = !fixed"
-      >
-        <v-icon>mdi-person</v-icon>
-      </v-btn>
+     <strong>
+                  Rúbrica de Evaluación
+                  </strong>
+                  <v-spacer></v-spacer>
+                   <a href="/home" class="pt-1">
+           <img src="@/static/img/company_logo.png" width="130" href="/home/"/>
+          </a>
     </v-app-bar>
     <v-content>
       <v-container>
         <nuxt />
       </v-container>
     </v-content>
-  
-    <v-footer
-      :fixed="fixed"
-      app
+  <v-footer
+     :fixed="fixed"
+      class="font-weight-medium"
     >
-      <span>&copy; Rubricá de evaluación 2019-2 LuisFelipeG JuanesQuientero KevinOspina SebasRamirez</span>
+      <v-col
+        class="text-center"
+        cols="12"
+      >
+         <span>LuisFelipeG - JuanesQuintero - KevinOspina - SebasRamirez</span> 
+      </v-col>
     </v-footer>
   </v-app>
 </template>
 
 <script>
+import config from '@/assets/js/config'
+
 export default {
   data () {
     return {
+      config:config,
       clipped: true,
       drawer: false,
       fixed: false,
-      items: [
-        {
-          icon: 'mdi-apps',
-          title: 'Welcome',
-          to: '/'
-        },
-         {
-          icon: 'mdi-apps',
-          title: 'Welcome',
-          to: '/'
-        },
-        {
-          icon: 'mdi-chart-bubble',
-          title: 'Inspire',
-          to: '/inspire'
-        }
-      ],
+      items: config.menuLateral,
       miniVariant: false,
       right: true,
       rightDrawer: false,

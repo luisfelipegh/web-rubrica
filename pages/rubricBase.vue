@@ -1,0 +1,60 @@
+<template>
+   <v-layout
+    justify-center
+    align-center
+  >
+    <v-flex
+      xs12
+      sm8
+      md6
+    >
+      <v-card>
+        <v-card-title class="headline">
+         <strong> 
+           <center>
+           Creación de la Rúbrica </center></strong>
+        </v-card-title>
+        <center>
+       </center>
+        <v-card-actions>
+        </v-card-actions>
+      </v-card>
+    </v-flex>
+  </v-layout>
+</template>
+
+<script>
+export default {
+  data(){
+    return{
+      levels:[
+        {
+          id:1,
+          name:'Conocimiento'
+        },
+        {
+          id:2,
+          name:'Comprensión'
+        },
+        {
+          id:3,
+          name:'Sintesis'
+        },
+        {
+          id:4,
+          name:'Aplicación'
+        },
+        {
+          id:5,
+          name:'Análisis'
+        },
+        {
+          id:6,
+          name:'Evaluación'
+        }
+      ]
+    }
+  }
+}
+</script>
+
