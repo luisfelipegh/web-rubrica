@@ -56,7 +56,6 @@ export default {
   ** https://github.com/nuxt-community/vuetify-module
   */
   vuetify: {
-    customVariables: ['~/assets/variables.scss'],
     defaultAssets:{
       font: true,
       icons: 'md'
