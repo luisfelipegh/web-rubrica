@@ -9,9 +9,10 @@ let config = {
     menuLateral:[
         {
             icon: 'dashboard',
-            title: 'Base de Rúbrica',
+            title: 'Plantillas Rúbrica',
             to: routes.rubricBase
-          }
+        }
+          
     ]
 }
 

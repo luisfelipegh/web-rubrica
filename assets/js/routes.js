@@ -1,7 +1,8 @@
 let routes = 
 {
     home:'/home',
-    rubricBase:'/rubricBase'
+    rubricBase:'/rubricBase',
+    rubricBaseNew :'/rubricBase/new'
 }
 
 
