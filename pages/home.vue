@@ -11,7 +11,6 @@
     >
       <div class="text-center">
         <logo />
-        <vuetify-logo />
       </div>
       <v-card>
         <v-card-title class="headline">

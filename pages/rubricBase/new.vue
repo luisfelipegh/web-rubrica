@@ -101,7 +101,7 @@
                     </v-form>
                     <v-row>
                       <v-col cols="12" sm="12">
-                          <v-simple-table dense>
+                        <v-simple-table dense>
                                   <thead>
                                     <tr>
                                       <th class="text-left">Categoria</th>
@@ -110,27 +110,28 @@
                                   </thead>
                                 <tbody>
                                     <tr v-for="(item,index) in n.categories" :key="item.name">
-                                      <td>{{ item.category }}</td>
+                                      
+                                      <td>{{index+1}} - {{ item.category }}</td>
                                       <td>
-                                          <v-simple-table dense>
+                                          <v-simple-table dense>   
                                   <tbody>
                                     <tr v-for="(item2,index) in item.skills" :key="item2.name">
-                                      <td>{{ item2.text }}</td>
+                                      <td>{{index+1}} -{{ item2.text }}</td>
                                     </tr>
                                   </tbody>
                           </v-simple-table>
                                       </td>
                                     </tr>
                                   </tbody>
-                          </v-simple-table>
-                          <!-- <template v-slot:item.action="{ item }">
+                        </v-simple-table>
+                        <!-- <template v-slot:item.action="{ item }">
                             <v-icon
                               small
                               class="mr-2"
                               color="primary"
                               @click="deleteItem(n,item)"
                             >delete</v-icon>
-                          </template> -->
+                        </template>-->
                       </v-col>
                     </v-row>
                   </v-container>
@@ -270,7 +271,7 @@ export default {
       vertical: true,
       currentData: {
         name: '',
-        
+
         levels: [
           {
             id: 1,

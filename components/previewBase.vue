@@ -1,35 +1,39 @@
 <template>
   <div>
-    <v-btn rounded color="primary" @click.stop="dialog = true">Ver</v-btn>
+    <v-btn rounded color="primary" @click.stop="prepare()">Ver</v-btn>
 
     <v-dialog persistent v-model="dialog">
       <v-card>
         <v-card-title class="headline">Previsualización de la rúbrica</v-card-title>
-
-        <table class="egt">
-          <tr class="print">
-            <th class="print">Niveles</th>
-            <th class="print">Categoria</th>
-            <th class="print">descripciones</th>
-          </tr>
-          <tr class="print" v-for="n in base.levels" :key="`${n.id}-row`">
-            <td class="print">{{n.name}}</td>
-            <td class="print">
-              <table >
-                <tr v-for="c in n.categories" :key="`${c}-row-category`">
-                  <td class="subprint">{{c.category}}</td>
-                </tr>
-              </table>
-            </td>
-            <td class="print">
-              <!-- <table>
-                <tr v-for="s in c.skills" :key="`${s}-row-category-skill`">
-                  <td>{{s.text}}</td>
-                </tr>
-              </table> -->
-            </td>
-          </tr>
-        </table>
+        <v-simple-table dense>
+          <thead>
+            <tr>
+              <th class="text-left">Nivel</th>
+              <th class="text-left">Categoria</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item,index) in current.levels" :key="item.name">
+              <td v-if="item.categories.length!=0">{{index+1}} - {{ item.name }}</td>
+              <td>
+                <v-simple-table dense>
+                  <tbody>
+                    <tr v-for="(item2,index) in item.categories" :key="item2.name">
+                      <td>{{index+1}} -{{ item2.category }}</td>
+                      <v-simple-table dense>
+                        <tbody>
+                          <tr v-for="(item3,index) in item2.skills" :key="item3.index">
+                            <td>{{index+1}} -{{ item3.text }}</td>
+                          </tr>
+                        </tbody>
+                      </v-simple-table>
+                    </tr>
+                  </tbody>
+                </v-simple-table>
+              </td>
+            </tr>
+          </tbody>
+        </v-simple-table>
 
         <v-card-actions>
           <div class="flex-grow-1"></div>
@@ -51,25 +55,18 @@ export default {
   },
   data() {
     return {
-      dialog: false
+      dialog: false,
+      current:{}
+    }
+  },
+  methods: {
+    prepare() {
+        this.current.levels= Object.assign([],this.base.levels.filter(x => x.categories.length > 0))
+    //   this.base.levels = this.base.levels.filter(x => x.categories.length > 0)
+      this.dialog = true
     }
   }
 }
 </script>
 <style >
-.egt {
-  border-collapse: collapse;
-}
-
-.egt {
-  border: 1px solid black;
-}
-.print{
-  border: 1px solid black;
-}
-.subprint{
-  border-bottom: 1px solid black;
-  
-}
-
 </style>
