@@ -20,7 +20,7 @@
           <v-card-title>
             Plantillas de Rúbricas
             <v-spacer></v-spacer>
-            <v-btn color="primary" @click.stop="$router.push(config.routes.rubricBaseNew)">Crear Rúbrica</v-btn>
+            <v-btn color="primary" rounded @click.stop="$router.push(config.routes.rubricBaseNew)">Crear Rúbrica</v-btn>
           </v-card-title>
           <v-card-text>
             <v-data-table :headers="headers" :items="items">

@@ -9,9 +9,6 @@
       sm8
       md6
     >
-      <div class="text-center">
-        <logo />
-      </div>
       <v-card>
         <v-card-title class="headline">
          <strong> Bienvenido al software de Rúbrica de Evaluación</strong>
