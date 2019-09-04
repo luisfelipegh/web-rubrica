@@ -48,7 +48,7 @@
                           >
                             <template v-slot:no-data>
                               <v-list-item>
-                                <span class="subheading">Create</span>
+                                <span class="subheading">Agregar </span>
                                 <v-chip label small>{{ search }}</v-chip>
                               </v-list-item>
                             </template>
@@ -96,7 +96,7 @@
                         <v-simple-table dense v-if="n.categories.length>0">
                           <thead>
                             <tr>
-                              <th class="text-left">Categoria</th>
+                              <th class="text-left">Categoría</th>
                               <th class="text-left">Habilidades</th>
 
                               <th class="text-center">Acciones</th>
@@ -131,10 +131,10 @@
                 <v-card-actions>
                   <v-row>
                     <v-col cols="12" sm="12" md="2">
-                      <v-btn color="primary" rounded @click="nextStep(n.id)">Agregar Categoria</v-btn>
+                      <v-btn color="primary" rounded @click="nextStep(n.id)">Agregar Categoría</v-btn>
                     </v-col>
                     <v-col cols="12" sm="12" md="3">
-                      <v-btn color="primary" rounded @click="ClearCategory(n)">Limpiar Categoria</v-btn>
+                      <v-btn color="primary" rounded @click="ClearCategory(n)">Limpiar Categoría</v-btn>
                     </v-col>
                   </v-row>
                 </v-card-actions>
@@ -232,7 +232,7 @@
                         <v-simple-table dense v-if="n.categories.length>0">
                           <thead>
                             <tr>
-                              <th class="text-left">Categoria</th>
+                              <th class="text-left">Categoría</th>
                               <th class="text-left">Habilidades</th>
 
                               <th class="text-center">Acciones</th>
