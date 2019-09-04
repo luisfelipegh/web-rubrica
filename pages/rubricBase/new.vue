@@ -1,5 +1,21 @@
 <template>
   <v-layout justify-center align-center>
+     <v-dialog v-model="dialogInfo" persistent max-width="290">
+      <v-card>
+        <v-card-title class="headline"
+          >Mensaje</v-card-title
+        >
+        <v-card-text
+          >{{messageInfo}}</v-card-text
+        >
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" rounded @click.native="closeDialog()"
+            >OK</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-flex xs12 sm12 md12>
       <v-card>
         <v-card-title class="headline">
@@ -9,11 +25,28 @@
           <v-spacer></v-spacer>
           <v-switch v-model="vertical" label="Vista Vertical"></v-switch>
         </v-card-title>
+         <v-form
+      ref="form"
+      lazy-validation
+    >
         <v-row class="pl-5">
+         
           <v-col cols="12" sm="6" md="4">
-            <v-text-field v-model="currentData.name" label="Nombre de la rúbrica"></v-text-field>
+            <v-text-field
+            requiered
+              v-model="currentData.nombre"
+              label="Nombre de la rúbrica"
+            ></v-text-field>
           </v-col>
-        </v-row>
+          <v-col cols="12" sm="6" md="4">
+            <v-text-field
+              requiered
+              v-model="currentData.semestre"
+              label="Semestre"
+            ></v-text-field>
+          </v-col>
+          
+        </v-row></v-form>
         <v-stepper v-model="e1" :vertical="vertical" :alt-labels="false">
           <template v-if="vertical">
             <template v-for="n in currentData.levels">
@@ -22,15 +55,19 @@
                 :complete="e1 > n.id"
                 :step="n.id"
                 :editable="editable"
-              >{{ n.name }}</v-stepper-step>
+                >{{ n.name }}</v-stepper-step
+              >
               <v-stepper-content :key="`${n.id}-content`" :step="n.id">
                 <v-card class="card-items mb-12">
                   <v-container>
-                    <h3>Agregar las categorias de {{n.name}}</h3>
+                    <h3>Agregar las categorias de {{ n.name }}</h3>
                     <v-form ref="formData">
                       <v-row>
                         <v-col cols="12" sm="6" md="4">
-                          <v-text-field v-model="category" label="Categoría"></v-text-field>
+                          <v-text-field
+                            v-model="category"
+                            label="Categoría"
+                          ></v-text-field>
                         </v-col>
                         <v-col cols="12" sm="6" md="6">
                           <!-- -->
@@ -52,7 +89,14 @@
                                 <v-chip label small>{{ search }}</v-chip>
                               </v-list-item>
                             </template>
-                            <template v-slot:selection="{ attrs, item, parent, selected }">
+                            <template
+                              v-slot:selection="{
+                                attrs,
+                                item,
+                                parent,
+                                selected
+                              }"
+                            >
                               <v-chip
                                 v-if="item === Object(item)"
                                 v-bind="attrs"
@@ -61,7 +105,9 @@
                                 small
                               >
                                 <span class="pr-2">{{ item.text }}</span>
-                                <v-icon small @click="parent.selectItem(item)">close</v-icon>
+                                <v-icon small @click="parent.selectItem(item)"
+                                  >close</v-icon
+                                >
                               </v-chip>
                             </template>
                             <template v-slot:item="{ index, item }">
@@ -75,11 +121,18 @@
                                 solo
                                 @keyup.enter="edit(index, item)"
                               ></v-text-field>
-                              <v-chip v-else dark label small>{{ item.text }}</v-chip>
+                              <v-chip v-else dark label small>{{
+                                item.text
+                              }}</v-chip>
                               <div class="flex-grow-1"></div>
                               <v-list-item-action @click.stop>
-                                <v-btn icon @click.stop.prevent="edit(index, item)">
-                                  <v-icon>{{ editing !== item ? 'close' : 'check' }}</v-icon>
+                                <v-btn
+                                  icon
+                                  @click.stop.prevent="edit(index, item)"
+                                >
+                                  <v-icon>{{
+                                    editing !== item ? 'close' : 'check'
+                                  }}</v-icon>
                                 </v-btn>
                               </v-list-item-action>
                             </template>
@@ -87,29 +140,40 @@
                         </v-col>
 
                         <v-col cols="12" sm="6" md="2">
-                          <v-btn color="primary" rounded @click="aggregateItem(n)">Agregar</v-btn>
+                          <v-btn
+                            color="primary"
+                            rounded
+                            @click="aggregateItem(n)"
+                            >Agregar</v-btn
+                          >
                         </v-col>
                       </v-row>
                     </v-form>
                     <v-row>
                       <v-col cols="12" sm="12">
-                        <v-simple-table dense v-if="n.categories.length>0">
+                        <v-simple-table dense v-if="n.categories.length > 0">
                           <thead>
                             <tr>
                               <th class="text-left">Categoría</th>
                               <th class="text-left">Habilidades</th>
-
                               <th class="text-center">Acciones</th>
                             </tr>
                           </thead>
                           <tbody>
-                            <tr v-for="(item,index) in n.categories" :key="item.name">
-                              <td>{{index+1}} - {{ item.category }}</td>
+                            <tr
+                              v-for="(item, index) in n.categories"
+                              :key="item.name"
+                            >
+                              <td>{{ index + 1 }} - {{ item.category }}</td>
                               <td>
                                 <v-simple-table dense>
                                   <tbody>
-                                    <tr v-for="(item2,index) in item.skills" :key="item2.name">
-                                      <td>{{index+1}} -{{ item2.text }}</td>
+                                    <tr
+                                      v-for="(item2, index) in item.skills"
+                                      :key="item2.name"
+                                    >
+                                      <td>{{ index + 1 }} -{{ item2.text }}</td>
+                                      
                                     </tr>
                                   </tbody>
                                 </v-simple-table>
@@ -118,8 +182,15 @@
                                 <v-icon
                                   class="mr-2"
                                   color="primary"
-                                  @click="deleteItem(n,item)"
-                                >delete</v-icon>
+                                  @click="deleteItem(n, item)"
+                                  >delete</v-icon
+                                >
+                                <v-icon
+                                  class="mr-2"
+                                  color="primary"
+                                  @click="editItem(n, item)"
+                                  >edit</v-icon
+                                >
                               </td>
                             </tr>
                           </tbody>
@@ -131,10 +202,14 @@
                 <v-card-actions>
                   <v-row>
                     <v-col cols="12" sm="12" md="2">
-                      <v-btn color="primary" rounded @click="nextStep(n.id)">Agregar Categoría</v-btn>
+                      <v-btn color="primary" rounded @click="nextStep(n.id)"
+                        >Agregar Nivel</v-btn
+                      >
                     </v-col>
                     <v-col cols="12" sm="12" md="3">
-                      <v-btn color="primary" rounded @click="ClearCategory(n)">Limpiar Categoría</v-btn>
+                      <v-btn color="primary" rounded @click="ClearCategory(n)"
+                        >Limpiar Nivel</v-btn
+                      >
                     </v-col>
                   </v-row>
                 </v-card-actions>
@@ -149,7 +224,8 @@
                   :complete="e1 > n.id"
                   :step="n.id"
                   :editable="editable"
-                >{{n.name}}</v-stepper-step>
+                  >{{ n.name }}</v-stepper-step
+                >
                 <v-divider v-if="n.id !== steps" :key="n.id"></v-divider>
               </template>
             </v-stepper-header>
@@ -162,11 +238,14 @@
               >
                 <v-card class="card-items mb-12">
                   <v-container>
-                    <h3>Agregar las categorias de {{n.name}}</h3>
+                    <h3>Agregar las categorias de {{ n.name }}</h3>
                     <v-form ref="formData">
                       <v-row>
                         <v-col cols="12" sm="6" md="4">
-                          <v-text-field v-model="category" label="Categoría"></v-text-field>
+                          <v-text-field
+                            v-model="category"
+                            label="Categoría"
+                          ></v-text-field>
                         </v-col>
                         <v-col cols="12" sm="6" md="6">
                           <!-- -->
@@ -188,7 +267,14 @@
                                 <v-chip label small>{{ search }}</v-chip>
                               </v-list-item>
                             </template>
-                            <template v-slot:selection="{ attrs, item, parent, selected }">
+                            <template
+                              v-slot:selection="{
+                                attrs,
+                                item,
+                                parent,
+                                selected
+                              }"
+                            >
                               <v-chip
                                 v-if="item === Object(item)"
                                 v-bind="attrs"
@@ -197,7 +283,9 @@
                                 small
                               >
                                 <span class="pr-2">{{ item.text }}</span>
-                                <v-icon small @click="parent.selectItem(item)">close</v-icon>
+                                <v-icon small @click="parent.selectItem(item)"
+                                  >close</v-icon
+                                >
                               </v-chip>
                             </template>
                             <template v-slot:item="{ index, item }">
@@ -211,11 +299,18 @@
                                 solo
                                 @keyup.enter="edit(index, item)"
                               ></v-text-field>
-                              <v-chip v-else dark label small>{{ item.text }}</v-chip>
+                              <v-chip v-else dark label small>{{
+                                item.text
+                              }}</v-chip>
                               <div class="flex-grow-1"></div>
                               <v-list-item-action @click.stop>
-                                <v-btn icon @click.stop.prevent="edit(index, item)">
-                                  <v-icon>{{ editing !== item ? 'close' : 'check' }}</v-icon>
+                                <v-btn
+                                  icon
+                                  @click.stop.prevent="edit(index, item)"
+                                >
+                                  <v-icon>{{
+                                    editing !== item ? 'close' : 'check'
+                                  }}</v-icon>
                                 </v-btn>
                               </v-list-item-action>
                             </template>
@@ -223,13 +318,18 @@
                         </v-col>
 
                         <v-col cols="12" sm="6" md="2">
-                          <v-btn color="primary" rounded @click="aggregateItem(n)">Agregar</v-btn>
+                          <v-btn
+                            color="primary"
+                            rounded
+                            @click="aggregateItem(n)"
+                            >Agregar</v-btn
+                          >
                         </v-col>
                       </v-row>
                     </v-form>
                     <v-row>
                       <v-col cols="12" sm="12">
-                        <v-simple-table dense v-if="n.categories.length>0">
+                        <v-simple-table dense v-if="n.categories.length > 0">
                           <thead>
                             <tr>
                               <th class="text-left">Categoría</th>
@@ -239,23 +339,36 @@
                             </tr>
                           </thead>
                           <tbody>
-                            <tr v-for="(item,index) in n.categories" :key="item.name">
-                              <td>{{index+1}} - {{ item.category }}</td>
+                            <tr
+                              v-for="(item, index) in n.categories"
+                              :key="item.name"
+                            >
+                              <td>{{ index + 1 }} - {{ item.category }}</td>
                               <td>
                                 <v-simple-table dense>
                                   <tbody>
-                                    <tr v-for="(item2,index) in item.skills" :key="item2.name">
-                                      <td>{{index+1}} -{{ item2.text }}</td>
+                                    <tr
+                                      v-for="(item2, index) in item.skills"
+                                      :key="item2.name"
+                                    >
+                                      <td>{{ index + 1 }} -{{ item2.text }}</td>
                                     </tr>
                                   </tbody>
                                 </v-simple-table>
                               </td>
                               <td class="text-center">
+                                 <v-icon
+                                  class="mr-2"
+                                  color="primary"
+                                  @click="editItem(n, item)"
+                                  >edit</v-icon
+                                >
                                 <v-icon
                                   class="mr-2"
                                   color="primary"
-                                  @click="deleteItem(n,item)"
-                                >delete</v-icon>
+                                  @click="deleteItem(n, item)"
+                                  >delete</v-icon
+                                >
                               </td>
                             </tr>
                           </tbody>
@@ -267,10 +380,14 @@
                 <v-card-actions>
                   <v-row>
                     <v-col cols="12" sm="12" md="2">
-                      <v-btn color="primary" rounded @click="nextStep(n.id)">Agregar Categoria</v-btn>
+                      <v-btn color="primary" rounded @click="nextStep(n.id)"
+                        >Agregar Nivel</v-btn
+                      >
                     </v-col>
                     <v-col cols="12" sm="12" md="3">
-                      <v-btn color="primary" rounded @click="ClearCategory(n)">Limpiar Categoria</v-btn>
+                      <v-btn color="primary" rounded @click="ClearCategory(n)"
+                        >Limpiar Nivel</v-btn
+                      >
                     </v-col>
                   </v-row>
                 </v-card-actions>
@@ -281,7 +398,9 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <preview-base :base="currentData" />
-          <v-btn class="ml-3" color="primary" rounded @click="Save()">Guardar Rúbrica</v-btn>
+          <v-btn class="ml-3" color="primary" rounded @click="saveData()"
+            >Guardar Rúbrica</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-flex>
@@ -289,6 +408,7 @@
 </template>
 
 <script>
+import config from '@/assets/js/config'
 import previewBase from '@/components/previewBase'
 export default {
   components: {
@@ -296,12 +416,17 @@ export default {
   },
   data() {
     return {
+      routeIndexRubric:config.routes.rubricBase,
+       messageInfo:'',
+       typeMessage:'',
+      dialogInfo:false,
       headers: [
         { text: 'Categoria', value: 'category' },
         { text: 'Habilidades', value: 'skills' },
         { text: 'Acciones', value: 'action' }
       ],
       e1: 1,
+      loading: false,
       steps: 0,
       //
       activator: null,
@@ -320,8 +445,8 @@ export default {
       editable: true,
       vertical: true,
       currentData: {
-        name: '',
-
+        nombre: '',
+        semestre:'',
         levels: [
           {
             id: 1,
@@ -386,6 +511,54 @@ export default {
     }
   },
   methods: {
+    closeDialog(){
+      if(this.typeMessage=='error'){
+        this.dialogInfo = true
+        this.messageInfo =''
+      }
+      if(this.typeMessage=='info'){
+        this.dialogInfo = true
+        this.$router.push(routeIndexRubric)
+         this.messageInfo =''
+      }
+    },
+    saveData() {
+      if(this.currentData.nombre!='' && this.currentData.semestre != ''){
+      let url = 'rubricas/'
+      let token = this.$cookie.get(config.cookie.token)
+      var options = {
+        headers: { Authorization: 'Bearer ' + token }
+      }
+      this.loading = true
+      this.currentData.usuario_creacion = this.$cookie.get(config.cookie.usuario)
+      let data = {
+        json : Object.assign({},this.currentData),
+        nombre: this.currentData.nombre,
+        semestre: this.currentData.semestre,
+        usuario_id: this.$cookie.get(config.cookie.usuario)
+      }
+      data.json.levels= Object.assign([], data.json.levels.filter(x => x.categories.length > 0))
+      
+      this.$axios
+        .post(url, data, options )
+        .then(async res => {
+          let data = res
+           this.messageInfo = 'Se guardo correctamente'
+           this.dialogInfo = true
+        })
+        .catch(err => {
+          console.log(err)
+        })
+        .finally(() => {
+          this.loading = false
+        })
+      this.loading = false
+      
+      }else{
+        this.messageInfo = 'Error por favor revisa los campos'
+        this.dialogInfo = true
+      }
+    },
     edit(index, item) {
       if (!this.editing) {
         this.editing = item
@@ -397,9 +570,7 @@ export default {
     },
     filter(item, queryText, itemText) {
       if (item.header) return false
-
       const hasValue = val => (val != null ? val : '')
-
       const text = hasValue(itemText)
       const query = hasValue(queryText)
 
@@ -413,6 +584,16 @@ export default {
     ClearCategory(level) {
       let level_modify = this.currentData.levels.find(x => x.id === level.id)
       level_modify.categories = []
+    },
+    editItem(n,item){
+      let level_modify = this.currentData.levels.find(x => x.id === n.id)
+      let i = level_modify.categories.indexOf(item)
+      this.skills = level_modify.categories[i].skills
+      this.category = level_modify.categories[i].category
+      if (i !== -1) {
+        level_modify.categories.splice(i, 1)
+      }
+      
     },
     deleteItem(n, item) {
       let level_modify = this.currentData.levels.find(x => x.id === n.id)
@@ -458,5 +639,5 @@ export default {
   -webkit-border-radius: 10px 10px 10px 10px;
   border: 2px solid #656565 !important;
 }
-</style>
 
+</style>

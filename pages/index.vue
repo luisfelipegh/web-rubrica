@@ -1,6 +1,7 @@
 <template>
   <v-app id="inspire">
     <v-content>
+     
       <loading :dialog="loading"></loading>
       <v-container
         class="fill-height"
@@ -28,7 +29,7 @@
               <v-card-text>
                 <v-form>
                   <v-text-field
-                     v-model="currentData.email"
+                     v-model="currentData.username"
                     label="Correo"
                     name="login"
                     :rules="[rules.required, rules.email]"
@@ -70,7 +71,7 @@ export default {
   beforeMount() {},
   data(){
     return{
-      config:config,
+    config:config,
     currentData: {},
     loading: false,
     message: '',
@@ -85,10 +86,26 @@ export default {
   },
   methods: {
     login() {
+     let url = 'token/' 
      this.loading=true
-     this.$router.push(routes.home)
-    this.loading=false
-     console.log(this.currentData);
+
+     this.$axios
+          .post(url, this.currentData,{})
+          .then(async res => {
+            let data = res
+            if(data.status==200){
+               this.$cookie.set(config.cookie.token, data.data.token, 1);
+                this.$cookie.set(config.cookie.usuario, this.currentData.username, 1);
+              this.$router.push(routes.home)
+            }
+            
+          })
+          .catch(err => {
+          })
+          .finally(() => {
+            this.loading = false
+          })
+     this.loading=false
     }
   }
 }

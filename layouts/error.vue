@@ -5,7 +5,6 @@
        <center>
             <h1 v-if="error.statusCode === 404">{{ pageNotFound }}</h1>
             <h1 v-else>{{ otherError }}</h1>
-        
           <img src="@/static/img/company_logo_error.png" width="500" />
        <br/>
         <NuxtLink to="/home">Página de inicio</NuxtLink>
@@ -18,7 +17,7 @@
 
 <script>
 export default {
-  layout: 'empty',
+  layout: 'blank',
   props: {
     error: {
       type: Object,

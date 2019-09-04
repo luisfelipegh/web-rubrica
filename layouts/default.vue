@@ -36,9 +36,36 @@
                   Rúbrica de Evaluación
                   </strong>
                   <v-spacer></v-spacer>
-                   <a href="/home" class="pt-1">
+                   <a href="/home" class="pt-1"></a>
+
            <img src="@/static/img/company_logo.png" width="130" href="/home/"/>
-          </a>
+                  <v-spacer></v-spacer>
+
+         <v-menu>
+      <template v-slot:activator="{ on }">
+        <v-btn
+          color="primary"
+          dark
+          v-on="on"
+        >
+          {{user}}
+        </v-btn>
+      </template>
+      <v-list>
+       <v-list-item
+         @click="Perfil()"
+        >
+          <v-list-item-title>Perfil</v-list-item-title>
+        </v-list-item>
+        <v-list-item
+         @click="close()"
+        >
+
+          <v-list-item-title>Salir</v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-menu>
+          
     </v-app-bar>
     <v-content>
       <v-container>
@@ -65,6 +92,7 @@ import config from '@/assets/js/config'
 export default {
   data () {
     return {
+      user : this.$cookie.get(config.cookie.usuario),
       config:config,
       clipped: true,
       drawer: false,
@@ -76,11 +104,13 @@ export default {
       title: 'Vuetify.js'
     }
   },
-  beforeMount(){
-
-  },
   methods:{
-
+    close(){
+      this.$router.push('/')
+    },
+    perfil(){
+      this.$router.push('/')
+    }
   }
 }
 </script>

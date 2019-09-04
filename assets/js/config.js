@@ -3,7 +3,7 @@ let routes = require('./routes').default
 
 let config = {
     api:{
-        url:''
+        url:'http://localhost:8000/api/'
     },
     routes:routes,
     menuLateral:[
@@ -13,7 +13,11 @@ let config = {
             to: routes.rubricBase
         }
           
-    ]
+    ],
+    cookie:{
+        token :'token',
+        usuario:'usuario'
+    }
 }
 
 
