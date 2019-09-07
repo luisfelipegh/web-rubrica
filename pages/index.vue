@@ -1,7 +1,22 @@
 <template>
   <v-app id="inspire">
     <v-content>
-     
+      <v-dialog v-model="dialogInfo" persistent max-width="290">
+      <v-card>
+        <v-card-title class="headline"
+          >Mensaje</v-card-title
+        >
+        <v-card-text
+          >{{messageInfo}}</v-card-text
+        >
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" rounded @click.native="dialogInfo=false"
+            >OK</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
       <loading :dialog="loading"></loading>
       <v-container
         class="fill-height"
@@ -29,7 +44,7 @@
               <v-card-text>
                 <v-form>
                   <v-text-field
-                     v-model="currentData.username"
+                     v-model="currentData.correo"
                     label="Correo"
                     name="login"
                     :rules="[rules.required, rules.email]"
@@ -37,7 +52,7 @@
                     type="text"
                   ></v-text-field>
                   <v-text-field
-                     v-model="currentData.password"
+                     v-model="currentData.contrasena"
                     label="Contraseña"
                     name="password"
                     prepend-icon="lock"
@@ -71,6 +86,8 @@ export default {
   beforeMount() {},
   data(){
     return{
+      dialogInfo:false,
+      messageInfo:'',
     config:config,
     currentData: {},
     loading: false,
@@ -86,21 +103,24 @@ export default {
   },
   methods: {
     login() {
-     let url = 'token/' 
+     let url = 'login/' 
      this.loading=true
 
      this.$axios
           .post(url, this.currentData,{})
           .then(async res => {
             let data = res
+            console.log(data);
             if(data.status==200){
-               this.$cookie.set(config.cookie.token, data.data.token, 1);
-                this.$cookie.set(config.cookie.usuario, this.currentData.username, 1);
+              this.$cookie.set(config.cookie.token, data.data.token, 1);
+              this.$cookie.set(config.cookie.usuario, data.data.user.correo, 1);
               this.$router.push(routes.home)
             }
             
           })
           .catch(err => {
+            this.dialogInfo=true
+            this.messageInfo='Contraseña y/o Correo Invalidos '
           })
           .finally(() => {
             this.loading = false

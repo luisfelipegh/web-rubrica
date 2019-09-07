@@ -527,7 +527,7 @@ export default {
       let url = 'rubricas/'
       let token = this.$cookie.get(config.cookie.token)
       var options = {
-        headers: { Authorization: 'Bearer ' + token }
+        headers: { token :  token }
       }
       this.loading = true
       this.currentData.usuario_creacion = this.$cookie.get(config.cookie.usuario)
@@ -535,7 +535,7 @@ export default {
         json : Object.assign({},this.currentData),
         nombre: this.currentData.nombre,
         semestre: this.currentData.semestre,
-        usuario_id: this.$cookie.get(config.cookie.usuario)
+        creador: this.$cookie.get(config.cookie.usuario)
       }
       data.json.levels= Object.assign([], data.json.levels.filter(x => x.categories.length > 0))
       
@@ -543,8 +543,11 @@ export default {
         .post(url, data, options )
         .then(async res => {
           let data = res
+          if(data.status==200){
+            this.typeMessage = 'info'
            this.messageInfo = 'Se guardo correctamente'
            this.dialogInfo = true
+          }
         })
         .catch(err => {
           console.log(err)

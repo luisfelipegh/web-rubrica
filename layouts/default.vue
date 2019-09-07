@@ -92,7 +92,7 @@ import config from '@/assets/js/config'
 export default {
   data () {
     return {
-      user : this.$cookie.get(config.cookie.usuario),
+      user : '',
       config:config,
       clipped: true,
       drawer: false,
@@ -101,10 +101,16 @@ export default {
       miniVariant: false,
       right: true,
       rightDrawer: false,
-      title: 'Vuetify.js'
+    }
+  },
+  beforeMount(){
+    let user = this.$cookie.get(config.cookie.usuario)
+    if (user){
+      this.user= this.$cookie.get(config.cookie.usuario)
     }
   },
   methods:{
+
     close(){
       this.$router.push('/')
     },

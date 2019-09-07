@@ -142,8 +142,8 @@ this.previewR=true
     confirmDelete() {
       let url = 'rubricas/' + this.toDelete.id
       let token = this.$cookie.get(config.cookie.token)
-      var options = {
-        headers: { Authorization: 'Bearer ' + token }
+     var options = {
+        headers: { token :  token }
       }
       console.log(options)
       this.loading = true
@@ -176,9 +176,8 @@ this.previewR=true
       let url = 'rubricas/'
       let token = this.$cookie.get(config.cookie.token)
       var options = {
-        headers: { Authorization: 'Bearer ' + token }
+        headers: { token :  token }
       }
-      console.log(options)
       this.loading = true
       let response = await this.$axios.get(url, options)
       this.loading = false
