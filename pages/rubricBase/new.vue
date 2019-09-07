@@ -33,16 +33,18 @@
          
           <v-col cols="12" sm="6" md="4">
             <v-text-field
-            requiered
+            required
               v-model="currentData.nombre"
               label="Nombre de la rúbrica"
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="6" md="4">
             <v-text-field
-              requiered
+              required
+              
               v-model="currentData.semestre"
               label="Semestre"
+              type="number"
             ></v-text-field>
           </v-col>
           
@@ -417,7 +419,7 @@ export default {
   data() {
     return {
       routeIndexRubric:config.routes.rubricBase,
-       messageInfo:'',
+      messageInfo:'',
        typeMessage:'',
       dialogInfo:false,
       headers: [
@@ -479,7 +481,8 @@ export default {
             categories: []
           }
         ]
-      }
+      },
+      
     }
   },
 
@@ -513,17 +516,18 @@ export default {
   methods: {
     closeDialog(){
       if(this.typeMessage=='error'){
-        this.dialogInfo = true
+        this.dialogInfo = false
         this.messageInfo =''
       }
       if(this.typeMessage=='info'){
-        this.dialogInfo = true
-        this.$router.push(routeIndexRubric)
+        this.dialogInfo = false
+        this.$router.push(this.routeIndexRubric)
          this.messageInfo =''
       }
     },
     saveData() {
-      if(this.currentData.nombre!='' && this.currentData.semestre != ''){
+      let levels =  Object.assign([], this.currentData.levels.filter(x => x.categories.length > 0))
+      if(this.currentData.nombre!='' && this.currentData.semestre != ''  && levels.length > 0  ){
       let url = 'rubricas/'
       let token = this.$cookie.get(config.cookie.token)
       var options = {
@@ -537,7 +541,7 @@ export default {
         semestre: this.currentData.semestre,
         creador: this.$cookie.get(config.cookie.usuario)
       }
-      data.json.levels= Object.assign([], data.json.levels.filter(x => x.categories.length > 0))
+      data.json.levels= levels
       
       this.$axios
         .post(url, data, options )
@@ -560,6 +564,7 @@ export default {
       }else{
         this.messageInfo = 'Error por favor revisa los campos'
         this.dialogInfo = true
+        this.typeMessage='error'
       }
     },
     edit(index, item) {

@@ -44,7 +44,7 @@
               <v-card-text>
                 <v-form>
                   <v-text-field
-                     v-model="currentData.correo"
+                    v-model="currentData.correo"
                     label="Correo"
                     name="login"
                     :rules="[rules.required, rules.email]"

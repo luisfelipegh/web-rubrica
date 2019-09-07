@@ -1,6 +1,22 @@
 <template>
   <div>
-    <v-dialog persistent v-model="previewR" v-if="toPreview!=undefined">
+        <v-dialog v-model="dialogInfo" persistent max-width="290">
+      <v-card>
+        <v-card-title class="headline"
+          >Mensaje</v-card-title
+        >
+        <v-card-text
+          >{{messageInfo}}</v-card-text
+        >
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" rounded @click.native="dialogInfo=false"
+            >OK</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog persistent v-model="previewR" v-if="toPreview != undefined">
       <v-card>
         <v-card-title class="headline">Previsualización de la rúbrica</v-card-title>
         <v-simple-table dense>
@@ -11,17 +27,17 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item,index) in toPreview.json.levels" :key="item.name">
-              <td v-if="item.categories.length!=0">{{index+1}} - {{ item.name }}</td>
+            <tr v-for="(item, index) in toPreview.json.levels" :key="item.name">
+              <td v-if="item.categories.length != 0">{{ index + 1 }} - {{ item.name }}</td>
               <td>
                 <v-simple-table dense>
                   <tbody>
-                    <tr v-for="(item2,index) in item.categories" :key="item2.name">
-                      <td>{{index+1}} -{{ item2.category }}</td>
+                    <tr v-for="(item2, index) in item.categories" :key="item2.name">
+                      <td>{{ index + 1 }} -{{ item2.category }}</td>
                       <v-simple-table dense>
                         <tbody>
-                          <tr v-for="(item3,index) in item2.skills" :key="item3.index">
-                            <td>{{index+1}} -{{ item3.text }}</td>
+                          <tr v-for="(item3, index) in item2.skills" :key="item3.index">
+                            <td>{{ index + 1 }} -{{ item3.text }}</td>
                           </tr>
                         </tbody>
                       </v-simple-table>
@@ -34,25 +50,26 @@
         </v-simple-table>
         <v-card-actions>
           <div class="flex-grow-1"></div>
-          <v-btn color="primary" rounded @click="previewR = false; toPreview=undefined">Ok</v-btn>
+          <v-btn
+            color="primary"
+            rounded
+            @click="
+              previewR = false
+              toPreview = undefined
+            "
+          >Ok</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
     <!-- DIALOGO ELIMINAR -->
     <v-dialog v-model="dialogDelete" persistent max-width="290">
       <v-card>
-        <v-card-title class="headline"
-          >¿Desea eliminar el dato seleccionado?</v-card-title
-        >
-        <v-card-text
-          >Al eliminar no se podrá recuperar posteriormente.</v-card-text
-        >
+        <v-card-title class="headline">¿Desea eliminar el dato seleccionado?</v-card-title>
+        <v-card-text>Al eliminar no se podrá recuperar posteriormente.</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn @click.native="dialogDelete = false" rounded>No</v-btn>
-          <v-btn color="primary" rounded @click.native="confirmDelete()"
-            >Sí</v-btn
-          >
+          <v-btn color="primary" rounded @click.native="confirmDelete()">Sí</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -67,8 +84,7 @@
               color="primary"
               rounded
               @click.stop="$router.push(config.routes.rubricBaseNew)"
-              >Crear Rúbrica</v-btn
-            >
+            >Crear Rúbrica</v-btn>
           </v-card-title>
           <v-card-text>
             <v-data-table :headers="headers" :items="items">
@@ -77,23 +93,14 @@
                   <td>{{ props.item.nombre }}</td>
                   <td>{{ props.item.semestre }}</td>
                   <td>{{ props.item.usuario_creacion }}</td>
-                
-                    
-                    
                 </tr>
               </template>
               <template v-slot:item.action="{ item }">
                 <!-- <preview-base :base="item" /> -->
-                <v-icon small class="pr-2" @click="preview(item)"
-                      >remove_red_eye</v-icon
-                    >
-                <v-icon small @click="deleteItem(item)">
-                  delete
-                </v-icon>
+                <v-icon small class="pr-2" @click="preview(item)">remove_red_eye</v-icon>
+                <v-icon small @click="deleteItem(item)">delete</v-icon>
               </template>
-              <template slot="no-data"
-                >No se encontraron Rúbricas</template
-              >
+              <template slot="no-data">No se encontraron Rúbricas</template>
             </v-data-table>
           </v-card-text>
         </v-card>
@@ -108,7 +115,6 @@ import config from '@/assets/js/config'
 export default {
   data() {
     return {
-
       dialogView:false,
       messageInfo: '',
       dialogInfo: false,
@@ -142,23 +148,24 @@ this.previewR=true
     confirmDelete() {
       let url = 'rubricas/' + this.toDelete.id
       let token = this.$cookie.get(config.cookie.token)
-     var options = {
+    var options = {
         headers: { token :  token }
       }
-      console.log(options)
       this.loading = true
       this.$axios
-        .delete(url, {}, options)
+        .delete(url,options)
         .then(async res => {
-          let data = res
+          if (data.status==200){
           this.dialogDelete = false
+          this.dialogInfo = true
+          this.messageInfo = data.data.info
           this.loadData()
+          }
         })
         .catch(err => {
           this.dialogDelete = false
           this.dialogInfo = true
-          this.messageInfo = 'Error al eliminar'
-          console.log(err)
+          this.messageInfo = err
         })
         .finally(() => {
           this.loading = false
@@ -169,7 +176,6 @@ this.previewR=true
       let data = await this.getAllData()
       if (data.status == 200) {
         this.items = data.data
-        console.log(data)
       }
     },
     async getAllData() {
