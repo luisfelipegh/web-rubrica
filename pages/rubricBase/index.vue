@@ -1,18 +1,12 @@
 <template>
   <div>
-        <v-dialog v-model="dialogInfo" persistent max-width="290">
+    <v-dialog v-model="dialogInfo" persistent max-width="290">
       <v-card>
-        <v-card-title class="headline"
-          >Mensaje</v-card-title
-        >
-        <v-card-text
-          >{{messageInfo}}</v-card-text
-        >
+        <v-card-title class="headline">Mensaje</v-card-title>
+        <v-card-text>{{ messageInfo }}</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" rounded @click.native="dialogInfo=false"
-            >OK</v-btn
-          >
+          <v-btn color="primary" rounded @click.native="dialogInfo = false">OK</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -115,7 +109,7 @@ import config from '@/assets/js/config'
 export default {
   data() {
     return {
-      dialogView:false,
+      dialogView: false,
       messageInfo: '',
       dialogInfo: false,
       config: config,
@@ -129,17 +123,17 @@ export default {
       items: [],
       loading: false,
       toDelete: undefined,
-      toPreview:undefined,
-      previewR :false
+      toPreview: undefined,
+      previewR: false
     }
   },
   beforeMount() {
     this.loadData()
   },
   methods: {
-    preview(item){
-      this.toPreview =item 
-this.previewR=true
+    preview(item) {
+      this.toPreview = item
+      this.previewR = true
     },
     deleteItem(item) {
       this.dialogDelete = true
@@ -148,18 +142,19 @@ this.previewR=true
     confirmDelete() {
       let url = 'rubricas/' + this.toDelete.id
       let token = this.$cookie.get(config.cookie.token)
-    var options = {
-        headers: { token :  token }
+      var options = {
+        headers: { token: token }
       }
       this.loading = true
       this.$axios
-        .delete(url,options)
+        .delete(url, options)
         .then(async res => {
-          if (data.status==200){
-          this.dialogDelete = false
-          this.dialogInfo = true
-          this.messageInfo = data.data.info
-          this.loadData()
+            let data = res
+          if (data.status == 200) {
+            this.dialogDelete = false
+            this.dialogInfo = true
+            this.messageInfo = data.data.info
+            this.loadData()
           }
         })
         .catch(err => {
@@ -182,7 +177,7 @@ this.previewR=true
       let url = 'rubricas/'
       let token = this.$cookie.get(config.cookie.token)
       var options = {
-        headers: { token :  token }
+        headers: { token: token }
       }
       this.loading = true
       let response = await this.$axios.get(url, options)

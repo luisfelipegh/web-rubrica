@@ -534,7 +534,7 @@ export default {
         headers: { token :  token }
       }
       this.loading = true
-      this.currentData.usuario_creacion = this.$cookie.get(config.cookie.usuario)
+      this.currentData.creador = this.$cookie.get(config.cookie.usuario)
       let data = {
         json : Object.assign({},this.currentData),
         nombre: this.currentData.nombre,

@@ -11,6 +11,11 @@ let config = {
             icon: 'dashboard',
             title: 'Plantillas Rúbrica',
             to: routes.rubricBase
+        },
+        {
+            icon: 'supervisor_account',
+            title: 'Grupos',
+            to: routes.groups
         }
           
     ],
