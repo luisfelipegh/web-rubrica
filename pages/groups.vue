@@ -10,7 +10,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="dialogPost" persistent max-width="290">
+    <v-dialog v-model="dialogPost" persistent max-width="400">
       <v-card>
         <v-card-title class="headline">Subir archivo</v-card-title>
             <input
@@ -20,6 +20,7 @@
               @change="onChange($event,'file')"
             />
         <v-card-actions>
+            <v-btn color="primary" rounded @click.native="cancelArchivo">Cancelar</v-btn>
           <v-spacer></v-spacer>
           <v-btn color="primary" rounded @click.native="subirArchivo">OK</v-btn>
         </v-card-actions>
@@ -117,11 +118,11 @@
                 </tr>
               </template>
               <template v-slot:item.action="{ item }">
-                 <v-btn color="primary" rounded @click.native="dialogPost=true">Agregar estudiantes</v-btn>
+                 <v-btn color="primary" rounded @click.native="agregarEstudiantes(item)">Agregar estudiantes</v-btn>
                 <v-icon small class="pr-2" @click="editItem(item)">edit</v-icon>
                 <v-icon small @click="deleteItem(item)">delete</v-icon>
               </template>
-              <template slot="no-data">No se encontraron Rúbricas</template>
+              <template slot="no-data">No se encontraron grupos</template>
             </v-data-table>
           </v-card-text>
         </v-card>
@@ -160,6 +161,7 @@ export default {
       dialogPost:false,
       editing: true,
       fileToImport:undefined,
+      toUpload:{},
       rules: {
         email: value => {
           const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -173,14 +175,23 @@ export default {
     this.loadData()
   },
   methods: {
+    agregarEstudiantes(item){
+      this.toUpload=item
+      this.dialogPost=true;
+    },
+    cancelArchivo(){
+      this.dialogPost=false;
+      this.toUpload={}
+    },
     subirArchivo(){
-       let url = 'upload/'
+      let url = 'upload/'
       let token = this.$cookie.get(config.cookie.token)
       var options = {
         headers: { token: token }
       }
       this.loading = true
       let data = this.fileToImport
+      data.grupo = this.toUpload
         this.$axios
           .post(url, data, options)
           .then(async res => {
