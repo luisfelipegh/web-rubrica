@@ -4,7 +4,8 @@ let routes =
     rubricBase:'/rubricBase',
     rubricBaseNew :'/rubricBase/new',
     groups:'/groups',
-    teams:'/teams'
+    teams:'/teams',
+    users:'/users'
 }
 
 

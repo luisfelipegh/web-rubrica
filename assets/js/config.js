@@ -21,6 +21,11 @@ let config = {
             icon: 'supervisor_account',
             title: 'Equipos',
             to: routes.teams
+        },
+        {
+            icon: 'person',
+            title: 'Usuarios',
+            to: routes.users
         }
           
     ],
