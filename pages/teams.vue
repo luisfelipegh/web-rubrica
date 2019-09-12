@@ -10,50 +10,23 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="dialogPost" persistent max-width="400">
-      <v-card>
-        <v-card-title class="headline">Subir archivo</v-card-title>
-            <input
-              label="Importar un Archivo"
-              type="file"
-              accept='.csv'
-              @change="onChange($event,'file')"
-            />
-        <v-card-actions>
-            <v-btn color="primary" rounded @click.native="cancelArchivo">Cancelar</v-btn>
-          <v-spacer></v-spacer>
-          <v-btn color="primary" rounded @click.native="subirArchivo">OK</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
     <v-dialog persistent v-model="dialogCreate" max-width="600">
       <v-card>
-        <v-card-title class="headline">{{editing?'Editar grupo':'Crear grupo'}}</v-card-title>
-        <div>
-          <v-form v-model="valid" ref="formData" lazy-validation>
+        <v-card-title class="headline">{{editing?'Editar equipo':'Crear equipo'}} {{selectedGroup?selectedGroup.nombre:''}}</v-card-title>
+        <div v-if="currentData!=undefined">
+          <v-form v-model="valid" ref="formData" lazy-validation >
             <v-row class="px-5">
-              <v-col cols="12" sm="6" md="6">
+              <v-col cols="12" sm="6" md="6" >
                 <v-text-field
                   required
-                  v-model="currentData.profesor"
-                  label="Profesor"
-                  name="Profesor"
-                  :rules="[rules.required, rules.email]"
+                  v-model="currentData.grupo.nombre"
+                  label="Grupo"
+                  name="Grupo"
+                  disabled
                   type="text"
                 ></v-text-field>
               </v-col>
-              <v-col cols="12" sm="6" md="6">
-                <v-text-field
-                  required
-                  :rules="nameRules"
-                  v-model="currentData.semestre"
-                  label="Semestre"
-                  type="number"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row class="px-5">
-              <v-col cols="12" sm="6" md="6">
+               <v-col cols="12" sm="6" md="6">
                 <v-text-field
                   :rules="nameRules"
                   required
@@ -62,6 +35,8 @@
                   type="text"
                 ></v-text-field>
               </v-col>
+            </v-row>
+            <v-row class="px-5">
               <v-col cols="12" sm="6" md="6">
                 <v-text-field
                   :rules="nameRules"
@@ -71,6 +46,24 @@
                   type="text"
                 ></v-text-field>
               </v-col>
+            <v-col cols="12" sm="6" md="6">
+              <v-autocomplete
+              label="Selecciona los estudiantes"
+              v-model="currentData.estudiantes"
+              :items="estudiantes"
+              multiple
+              no-data-text="Escribe para buscar "
+              chips
+              clearable
+              hide-selected
+              return-object
+              item-text="nombre"
+            >
+             <template v-slot:no-data>
+                <span>No se encontraron estudiantes</span>
+              </template>
+              </v-autocomplete>
+             </v-col>
             </v-row>
           </v-form>
         </div>
@@ -103,11 +96,20 @@
       <v-flex xs12>
         <v-card>
           <v-card-title>
-            Creación de grupos
+            Creación de equipos {{selectedGroup?selectedGroup.nombre:''}}
             <v-spacer></v-spacer>
-            <v-btn color="primary" rounded @click.stop="dialogCreateOpen()">Crear Grupo</v-btn>
+            <v-btn  v-if="selectedGroup!=undefined" color="primary" rounded @click.stop="dialogCreateOpen()">Crear Equipo</v-btn>
           </v-card-title>
           <v-card-text>
+             <v-autocomplete
+              label="Selecciona un grupo"
+              v-model="selectedGroup"
+              :items="grupos"
+              return-object
+              item-text="nombre"
+              @Change="findTeams"
+            ></v-autocomplete>
+            <div v-if="selectedGroup!=undefined">
             <v-data-table :headers="headers" :items="items">
               <template slot="items" slot-scope="props">
                 <tr>
@@ -118,12 +120,12 @@
                 </tr>
               </template>
               <template v-slot:item.action="{ item }">
-                 <v-btn color="primary" rounded @click.native="agregarEstudiantes(item)">Agregar estudiantes</v-btn>
                 <v-icon small class="pr-2" @click="editItem(item)">edit</v-icon>
                 <v-icon small @click="deleteItem(item)">delete</v-icon>
               </template>
-              <template slot="no-data">No se encontraron grupos</template>
+              <template slot="no-data">No se encontraron equipos</template>
             </v-data-table>
+            </div>
           </v-card-text>
         </v-card>
       </v-flex>
@@ -141,6 +143,8 @@ export default {
       nameRules: [v => !!v || 'Campo requerido'],
       valid: true,
       dialogView: false,
+      path:'equipos/',
+      grupos:[],
       messageInfo: '',
       dialogInfo: false,
       config: config,
@@ -153,7 +157,8 @@ export default {
         { text: 'Acciones', value: 'action', sortable: false }
       ],
       items: [],
-      currentData: {},
+      selectedGroup:undefined,
+      currentData: {grupo:{}},
       loading: false,
       toDelete: undefined,
       toPreview: undefined,
@@ -162,6 +167,7 @@ export default {
       editing: true,
       fileToImport:undefined,
       toUpload:{},
+      estudiantes:[],
       rules: {
         email: value => {
           const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -175,77 +181,28 @@ export default {
     this.loadData()
   },
   methods: {
-    agregarEstudiantes(item){
-      this.toUpload=item
-      this.dialogPost=true;
+    removeEst (item) {
+        const index = this.currentData.estudiantes.indexOf(item.name)
+        if (index >= 0) this.currentData.estudiantes.splice(index, 1)
+      },
+    async findTeams(){
+      this.items =[]
+    let data = await this.getAllData(this.selectedGroup)
+      if (data.status == 200 && Array.isArray(data.data)) {
+        this.items = data.data
+      }
     },
     cancelArchivo(){
       this.dialogPost=false;
       this.toUpload={}
     },
-    subirArchivo(){
-      let url = 'upload/grupos/'
-      let token = this.$cookie.get(config.cookie.token)
-      var options = {
-        headers: { token: token }
+   async dialogCreateOpen() {
+      let dataest = await this.getAllDataEstudiantes(this.selectedGroup)
+      if (dataest.status == 200 && Array.isArray(dataest.data)) {
+        this.estudiantes = dataest.data
       }
-      this.loading = true
-      let data = this.fileToImport
-      data.grupo = this.toUpload
-        this.$axios
-          .post(url, data, options)
-          .then(async res => {
-            let data = res
-            
-          })
-          .catch(err => {
-            this.typeMessage = 'error'
-            this.messageInfo = 'Hubo un error al guardar'
-          })
-          .finally(() => {
-            this.loading = false
-          })
-        this.loading = false
-    },
-    onChange(e, name) {
-      // get the files
-      let files = e.target.files
-      // Process each file
-      var allFiles = []
-      for (var i = 0; i < files.length; i++) {
-        let file = files[i]
-        // Make new FileReader
-        let reader = new FileReader()
-        // Convert the file to base64 text
-        reader.readAsDataURL(file)
-        // on reader load somthing...
-        reader.onload = () => {
-          // Make a fileInfo Object
-          let fileInfo = {
-            name: file.name,
-            type: file.type,
-            size: Math.round(file.size / 1000) + ' kB',
-            base64: reader.result,
-            file: file
-          }
-          // Push it to the state
-          allFiles.push(fileInfo)
-          // If all files have been proceed
-          if (allFiles.length == files.length) {
-            // Apply Callback function
-            if (this.multiple) {
-              this.done(allFiles)
-            } else {
-              this.fileToImport = allFiles[0]
-            }
-          }
-        } // reader.onload
-      } // for
-    }, 
-    dialogCreateOpen() {
-      this.currentData = {}
+      this.currentData.grupo = Object.assign({},this.selectedGroup)
       this.editing = false
-      this.currentData.profesor = this.$cookie.get(config.cookie.usuario)
       this.dialogCreate = true
     },
     editItem(item) {
@@ -327,7 +284,7 @@ export default {
       this.toDelete = item
     },
     confirmDelete() {
-      let url = 'grupos/' + this.toDelete.id
+      let url = this.path + this.toDelete.id
       let token = this.$cookie.get(config.cookie.token)
       var options = {
         headers: { token: token }
@@ -355,12 +312,36 @@ export default {
       this.loading = false
     },
     async loadData() {
-      let data = await this.getAllData()
-      if (data.status == 200) {
-        this.items = data.data
+      let data1 = await this.getAllDataGrupos()
+      if (data1.status == 200) {
+        this.grupos = data1.data
       }
     },
-    async getAllData() {
+     async getAllData(group) {
+
+      let url = this.path
+      let token = this.$cookie.get(config.cookie.token)
+      var options = {
+        headers: { token: token }
+      }
+      this.loading = true
+      let response = await this.$axios.get(url, options)
+      this.loading = false
+      this.grupos = response.data.data
+      return response
+    },
+    async getAllDataGrupos() {
+      let url = 'grupos/'
+      let token = this.$cookie.get(config.cookie.token)
+      var options = {
+        headers: { token: token }
+      }
+      this.loading = true
+      let response = await this.$axios.get(url, options)
+      this.loading = false
+      return response
+    },
+    async getAllDataEstudiantes() {
       let url = 'grupos/'
       let token = this.$cookie.get(config.cookie.token)
       var options = {

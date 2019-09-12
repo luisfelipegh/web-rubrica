@@ -28,16 +28,16 @@
     </v-dialog>
     <v-dialog persistent v-model="dialogCreate" max-width="600">
       <v-card>
-        <v-card-title class="headline">{{editing?'Editar grupo':'Crear grupo'}}</v-card-title>
+        <v-card-title class="headline">{{editing?'Editar usuario':'Crear usuario'}}</v-card-title>
         <div>
           <v-form v-model="valid" ref="formData" lazy-validation>
             <v-row class="px-5">
               <v-col cols="12" sm="6" md="6">
                 <v-text-field
                   required
-                  v-model="currentData.profesor"
-                  label="Profesor"
-                  name="Profesor"
+                  v-model="currentData.correo"
+                  label="Correo"
+                  name="Correo"
                   :rules="[rules.required, rules.email]"
                   type="text"
                 ></v-text-field>
@@ -46,30 +46,26 @@
                 <v-text-field
                   required
                   :rules="nameRules"
-                  v-model="currentData.semestre"
-                  label="Semestre"
-                  type="number"
+                  v-model="currentData.nombre"
+                  label="Nombre"
+                  type="text"
                 ></v-text-field>
               </v-col>
             </v-row>
             <v-row class="px-5">
               <v-col cols="12" sm="6" md="6">
-                <v-text-field
+                 <v-autocomplete
+                  label="Selecciona El tipo"
+                  v-model="currentData.tipo"
+                  :items="tipos"
                   :rules="nameRules"
-                  required
-                  v-model="currentData.codigo"
-                  label="codigo"
-                  type="text"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="6" md="6">
-                <v-text-field
-                  :rules="nameRules"
-                  required
-                  v-model="currentData.nombre"
-                  label="Nombre"
-                  type="text"
-                ></v-text-field>
+                  no-data-text="Escribe para buscar "
+                  item-text="nombre"
+                >
+             <template v-slot:no-data>
+                <span>No se encontraron estudiantes</span>
+              </template>
+              </v-autocomplete>
               </v-col>
             </v-row>
           </v-form>
@@ -103,22 +99,21 @@
       <v-flex xs12>
         <v-card>
           <v-card-title>
-            Creación de grupos
+            Creación de Usuarios
             <v-spacer></v-spacer>
-            <v-btn color="primary" rounded @click.stop="dialogCreateOpen()">Crear Grupo</v-btn>
+            <v-btn color="primary" rounded @click.native="agregarUsuarios()">Importacion de usuarios</v-btn>
+            <v-btn color="primary" rounded @click.stop="dialogCreateOpen()">Crear Usuario</v-btn>
           </v-card-title>
           <v-card-text>
             <v-data-table :headers="headers" :items="items">
               <template slot="items" slot-scope="props">
                 <tr>
+                  <td>{{ props.item.correo }}</td>
                   <td>{{ props.item.nombre }}</td>
-                  <td>{{ props.item.nombre }}</td>
-                  <td>{{ props.item.semestre }}</td>
-                  <td>{{ props.item.semestre }}</td>
+                  <td>{{ props.item.tipo }}</td>
                 </tr>
               </template>
               <template v-slot:item.action="{ item }">
-                 <v-btn color="primary" rounded @click.native="agregarEstudiantes(item)">Agregar estudiantes</v-btn>
                 <v-icon small class="pr-2" @click="editItem(item)">edit</v-icon>
                 <v-icon small @click="deleteItem(item)">delete</v-icon>
               </template>
@@ -140,16 +135,17 @@ export default {
     return {
       nameRules: [v => !!v || 'Campo requerido'],
       valid: true,
+      path:'usuarios/',
       dialogView: false,
       messageInfo: '',
       dialogInfo: false,
       config: config,
       dialogDelete: false,
+      tipos:[{nombre:'PROFESOR'},{nombre:'ESTUDIANTE'} ],
       headers: [
-        { text: 'Codigo', value: 'codigo' },
+        { text: 'Correo', value: 'correo' },
         { text: 'Nombre', value: 'nombre' },
-        { text: 'Semetre', value: 'semestre' },
-        { text: 'Profesor', value: 'profesor' },
+        { text: 'Tipo', value: 'tipo' },
         { text: 'Acciones', value: 'action', sortable: false }
       ],
       items: [],
@@ -161,7 +157,6 @@ export default {
       dialogPost:false,
       editing: true,
       fileToImport:undefined,
-      toUpload:{},
       rules: {
         email: value => {
           const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -175,8 +170,7 @@ export default {
     this.loadData()
   },
   methods: {
-    agregarEstudiantes(item){
-      this.toUpload=item
+    agregarUsuarios(){
       this.dialogPost=true;
     },
     cancelArchivo(){
@@ -184,14 +178,13 @@ export default {
       this.toUpload={}
     },
     subirArchivo(){
-      let url = 'upload/grupos/'
+      let url = 'upload/usuarios/'
       let token = this.$cookie.get(config.cookie.token)
       var options = {
         headers: { token: token }
       }
       this.loading = true
       let data = this.fileToImport
-      data.grupo = this.toUpload
         this.$axios
           .post(url, data, options)
           .then(async res => {
@@ -245,7 +238,6 @@ export default {
     dialogCreateOpen() {
       this.currentData = {}
       this.editing = false
-      this.currentData.profesor = this.$cookie.get(config.cookie.usuario)
       this.dialogCreate = true
     },
     editItem(item) {
@@ -254,16 +246,14 @@ export default {
       this.editing = true
     },
     saveData(data) {
-      let url = 'grupos/'
-
+      let url = this.path
       let token = this.$cookie.get(config.cookie.token)
       var options = {
         headers: { token: token }
       }
       this.loading = true
       if (this.editing) {
-        url += data.id
-        console.log(data)
+        url += data.correo
         this.$axios
           .put(url, data, options)
           .then(async res => {
@@ -286,6 +276,7 @@ export default {
           })
         this.loading = false
       } else {
+        data.contrasena = data.correo
         this.$axios
           .post(url, data, options)
           .then(async res => {
@@ -327,7 +318,7 @@ export default {
       this.toDelete = item
     },
     confirmDelete() {
-      let url = 'grupos/' + this.toDelete.id
+      let url = this.path + this.toDelete.correo
       let token = this.$cookie.get(config.cookie.token)
       var options = {
         headers: { token: token }
@@ -361,7 +352,7 @@ export default {
       }
     },
     async getAllData() {
-      let url = 'grupos/'
+      let url = this.path
       let token = this.$cookie.get(config.cookie.token)
       var options = {
         headers: { token: token }

@@ -16,6 +16,11 @@ let config = {
             icon: 'supervisor_account',
             title: 'Grupos',
             to: routes.groups
+        },
+        {
+            icon: 'supervisor_account',
+            title: 'Equipos',
+            to: routes.teams
         }
           
     ],
