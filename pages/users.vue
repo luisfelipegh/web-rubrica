@@ -188,10 +188,17 @@ export default {
         this.$axios
           .post(url, data, options)
           .then(async res => {
-            let data = res
+            if (res.status==200){
             
+            this.dialogInfo=true
+            this.dialogPost=false
+            this.typeMessage = 'info'
+            this.messageInfo = 'Se han insertado correctamente ' + res.data.insertados.length + ' han fallado ' +  res.data.no_insertados.length + ' repetidos ' + res.data.repetidos.length
+            this.loadData()
+            }
           })
           .catch(err => {
+            this.dialogInfo=true
             this.typeMessage = 'error'
             this.messageInfo = 'Hubo un error al guardar'
           })
