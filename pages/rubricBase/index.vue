@@ -86,7 +86,7 @@
                 <tr>
                   <td>{{ props.item.nombre }}</td>
                   <td>{{ props.item.semestre }}</td>
-                  <td>{{ props.item.usuario_creacion }}</td>
+                  <td>{{ props.item.creador }}</td>
                 </tr>
               </template>
               <template v-slot:item.action="{ item }">
@@ -117,7 +117,7 @@ export default {
       headers: [
         { text: 'Nombre', value: 'nombre' },
         { text: 'Semetre', value: 'semestre' },
-        { text: 'Usuario', value: 'json.usuario_creacion' },
+        { text: 'Usuario', value: 'creador' },
         { text: 'Acciones', value: 'action', sortable: false }
       ],
       items: [],

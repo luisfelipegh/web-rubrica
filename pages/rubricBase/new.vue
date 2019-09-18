@@ -541,8 +541,9 @@ export default {
         semestre: this.currentData.semestre,
         creador: this.$cookie.get(config.cookie.usuario)
       }
-      data.json.levels= levels
+      console.log(data);
       
+      data.json.levels= levels
       this.$axios
         .post(url, data, options )
         .then(async res => {

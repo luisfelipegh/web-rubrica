@@ -18,7 +18,7 @@ let config = {
             to: routes.groups
         },
         {
-            icon: 'supervisor_account',
+            icon: 'group_work',
             title: 'Equipos',
             to: routes.teams
         },

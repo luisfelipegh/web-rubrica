@@ -1,5 +1,17 @@
 <template>
   <div>
+     <!-- DIALOGO ELIMINAR -->
+    <v-dialog v-model="dialogDeleteStudent" persistent max-width="290">
+      <v-card>
+        <v-card-title class="headline">¿Desea eliminar el dato seleccionado?</v-card-title>
+        <v-card-text>Al eliminar no se podrá recuperar posteriormente.</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn @click.native="dialogDeleteStudent = false" rounded>No</v-btn>
+          <v-btn color="primary" rounded @click.native="confirmDeleteStudent()">Sí</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-dialog v-model="dialogInfo" persistent max-width="290">
       <v-card>
         <v-card-title class="headline">Mensaje</v-card-title>
@@ -13,16 +25,44 @@
     <v-dialog v-model="dialogPost" persistent max-width="400">
       <v-card>
         <v-card-title class="headline">Subir archivo</v-card-title>
-            <input
-              label="Importar un Archivo"
-              type="file"
-              accept='.csv'
-              @change="onChange($event,'file')"
-            />
+        <input
+          label="Importar un Archivo"
+          type="file"
+          accept=".csv"
+          @change="onChange($event,'file')"
+        />
         <v-card-actions>
-            <v-btn color="primary" rounded @click.native="cancelArchivo">Cancelar</v-btn>
+          <v-btn color="primary" rounded @click.native="cancelArchivo">Cancelar</v-btn>
           <v-spacer></v-spacer>
           <v-btn color="primary" rounded @click.native="subirArchivo">OK</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialogView" persistent max-width="600">
+      <v-card>
+        <v-card-title class="headline">Ver estudiantes</v-card-title>
+        <v-data-table  :headers="headersEstudiantes" :items="estudiantes">
+          <template slot="items" slot-scope="props">
+            <tr>
+              <td>{{ props.item.correo }}</td>
+              <td>{{ props.item.nombre }}</td>
+            </tr>
+          </template>
+              <template v-slot:item.action="{ item }">
+                  <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                      <v-btn icon v-on="on">
+                        <v-icon small class="pr-2" @click="removeStudent(item)">delete</v-icon>
+                      </v-btn>
+                    </template>
+                    <span>Ver Estudiantes</span>
+                  </v-tooltip>
+          </template>
+          <template slot="no-data">No se encontraron estudiantes en el grupo</template>
+        </v-data-table>
+
+        <v-card-actions>
+          <v-btn color="primary" rounded @click.native="closeView">Cerrar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -117,10 +157,39 @@
                   <td>{{ props.item.semestre }}</td>
                 </tr>
               </template>
-              <template v-slot:item.action="{ item }">
-                 <v-btn color="primary" rounded @click.native="agregarEstudiantes(item)">Agregar estudiantes</v-btn>
-                <v-icon small class="pr-2" @click="editItem(item)">edit</v-icon>
-                <v-icon small @click="deleteItem(item)">delete</v-icon>
+                <template v-slot:item.action="{ item }">
+                  <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                      <v-btn icon v-on="on">
+                        <v-icon small class="pr-2" @click="viewEstudiantes(item)">remove_red_eye</v-icon>
+                      </v-btn>
+                    </template>
+                    <span>Ver Estudiantes</span>
+                  </v-tooltip>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <v-btn icon v-on="on">
+                      <v-icon small class="pr-2" @click="agregarEstudiantes(item)">add</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Importar Estudiantes</span>
+                </v-tooltip>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <v-btn icon v-on="on">
+                      <v-icon small class="pr-2" @click="editItem(item)">edit</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Editar Grupo</span>
+                </v-tooltip>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <v-btn icon v-on="on">
+                      <v-icon small class="pr-2" @click="deleteItem(item)">delete</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Eliminar Grupo</span>
+                </v-tooltip>
               </template>
               <template slot="no-data">No se encontraron grupos</template>
             </v-data-table>
@@ -134,8 +203,7 @@
 <script>
 import config from '@/assets/js/config'
 export default {
-  components:{
-  },
+  components: {},
   data() {
     return {
       nameRules: [v => !!v || 'Campo requerido'],
@@ -143,6 +211,7 @@ export default {
       dialogView: false,
       messageInfo: '',
       dialogInfo: false,
+      dialogView: false,
       config: config,
       dialogDelete: false,
       headers: [
@@ -152,16 +221,23 @@ export default {
         { text: 'Profesor', value: 'profesor' },
         { text: 'Acciones', value: 'action', sortable: false }
       ],
+      headersEstudiantes: [
+        { text: 'Correo', value: 'correo' },
+        { text: 'Nombre', value: 'nombre' },
+        { text: 'Acciones', value: 'action', sortable: false }
+      ],
       items: [],
+      dialogDeleteStudent:false,
       currentData: {},
       loading: false,
       toDelete: undefined,
       toPreview: undefined,
       dialogCreate: false,
-      dialogPost:false,
+      dialogPost: false,
       editing: true,
-      fileToImport:undefined,
-      toUpload:{},
+      fileToImport: undefined,
+      toUpload: {},
+      estudiantes: [],
       rules: {
         email: value => {
           const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -175,30 +251,51 @@ export default {
     this.loadData()
   },
   methods: {
-    agregarEstudiantes(item){
-      this.toUpload=item
-      this.dialogPost=true;
+    closeView() {
+      this.dialogView = false
     },
-    cancelArchivo(){
-      this.dialogPost=false;
-      this.toUpload={}
+    async viewEstudiantes(item) {
+    let data = await this.getAllEstudiantes(item.codigo,item.semestre)
+      if (data.status == 200) {
+        this.estudiantes = data.data
+      }
+      console.log(this.estudiantes);
+      
+      this.dialogView = true
     },
-    subirArchivo(){
-      let url = 'upload/grupos/'
+    agregarEstudiantes(item) {
+      this.toUpload = item
+      this.dialogPost = true
+    },
+    cancelArchivo() {
+      this.dialogPost = false
+      this.toUpload = {}
+    },
+    removeStudent(item){
+      this.dialogDeleteStudent =true
+      this.toDelete = item
+    },
+    subirArchivo() {
+     let url = 'upload/grupos/'
       let token = this.$cookie.get(config.cookie.token)
       var options = {
         headers: { token: token }
       }
       this.loading = true
       let data = this.fileToImport
-      data.grupo = this.toUpload
         this.$axios
           .post(url, data, options)
           .then(async res => {
-            let data = res
-            
+            if (res.status==200){
+            this.dialogInfo=true
+            this.dialogPost=false
+            this.typeMessage = 'info'
+            this.messageInfo = 'Se han insertado correctamente ' + res.data.insertados.length + ' han fallado ' +  res.data.no_insertados.length + ' repetidos ' + res.data.repetidos.length
+            this.loadData()
+            }
           })
           .catch(err => {
+            this.dialogInfo=true
             this.typeMessage = 'error'
             this.messageInfo = 'Hubo un error al guardar'
           })
@@ -241,7 +338,7 @@ export default {
           }
         } // reader.onload
       } // for
-    }, 
+    },
     dialogCreateOpen() {
       this.currentData = {}
       this.editing = false
@@ -326,6 +423,36 @@ export default {
       this.dialogDelete = true
       this.toDelete = item
     },
+    confirmDeleteStudent() {
+      let url = `grupos/estudiantes/${this.toDelete.grupo}/${this.toDelete.semestre}/${this.toDelete.correo}`
+      let token = this.$cookie.get(config.cookie.token)
+      var options = {
+        headers: { token: token }
+      }
+      this.loading = true
+      this.$axios
+        .delete(url, options)
+        .then(async res => {
+          let data = res
+          if (data.status == 200) {
+           this.dialogView=false
+            this.dialogDeleteStudent = false
+            this.dialogInfo = true
+            this.messageInfo = 'Eliminado Correctamente'
+            this.toDelete={}
+            this.loadData()
+          }
+        })
+        .catch(err => {
+          this.dialogDeleteStudent = false
+          this.dialogInfo = true
+          this.messageInfo = err
+        })
+        .finally(() => {
+          this.loading = false
+        })
+      this.loading = false
+    },
     confirmDelete() {
       let url = 'grupos/' + this.toDelete.id
       let token = this.$cookie.get(config.cookie.token)
@@ -362,6 +489,17 @@ export default {
     },
     async getAllData() {
       let url = 'grupos/'
+      let token = this.$cookie.get(config.cookie.token)
+      var options = {
+        headers: { token: token }
+      }
+      this.loading = true
+      let response = await this.$axios.get(url, options)
+      this.loading = false
+      return response
+    },
+    async getAllEstudiantes(id,semestre) {
+      let url = `grupos/estudiantes/${id}/${semestre}`
       let token = this.$cookie.get(config.cookie.token)
       var options = {
         headers: { token: token }

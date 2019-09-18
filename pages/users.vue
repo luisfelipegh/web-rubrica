@@ -16,7 +16,7 @@
             <input
               label="Importar un Archivo"
               type="file"
-              accept='.csv'
+              accept='.txt'
               @change="onChange($event,'file')"
             />
         <v-card-actions>
@@ -218,6 +218,8 @@ export default {
         let reader = new FileReader()
         // Convert the file to base64 text
         reader.readAsDataURL(file)
+        console.log(reader);
+        
         // on reader load somthing...
         reader.onload = () => {
           // Make a fileInfo Object
@@ -345,7 +347,7 @@ export default {
         .catch(err => {
           this.dialogDelete = false
           this.dialogInfo = true
-          this.messageInfo = err
+          this.messageInfo = 'Revisa que el usuario no este en algún grupo o equipo'
         })
         .finally(() => {
           this.loading = false
