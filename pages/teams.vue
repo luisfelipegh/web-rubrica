@@ -30,23 +30,14 @@
                 <v-text-field
                   :rules="nameRules"
                   required
-                  v-model="currentData.codigo"
-                  label="codigo"
-                  type="text"
-                ></v-text-field>
-              </v-col>
-            </v-row>
-            <v-row class="px-5">
-              <v-col cols="12" sm="6" md="6">
-                <v-text-field
-                  :rules="nameRules"
-                  required
                   v-model="currentData.nombre"
                   label="Nombre"
                   type="text"
                 ></v-text-field>
               </v-col>
-            <v-col cols="12" sm="6" md="6">
+            </v-row>
+            <v-row class="px-5">
+            <!-- <v-col cols="12" sm="6" md="6">
               <v-autocomplete
               label="Selecciona los estudiantes"
               v-model="currentData.estudiantes"
@@ -63,7 +54,7 @@
                 <span>No se encontraron estudiantes</span>
               </template>
               </v-autocomplete>
-             </v-col>
+             </v-col> -->
             </v-row>
           </v-form>
         </div>
@@ -187,7 +178,7 @@ export default {
       },
     async findTeams(){
       this.items =[]
-    let data = await this.getAllData(this.selectedGroup)
+      let data = await this.getAllData(this.selectedGroup)
       if (data.status == 200 && Array.isArray(data.data)) {
         this.items = data.data
       }
@@ -196,8 +187,8 @@ export default {
       this.dialogPost=false;
       this.toUpload={}
     },
-   async dialogCreateOpen() {
-      let dataest = await this.getAllDataEstudiantes(this.selectedGroup)
+    async dialogCreateOpen() {
+      let dataest = await this.getAllEstudiantes(this.selectedGroup.codigo,this.selectedGroup.semestre)
       if (dataest.status == 200 && Array.isArray(dataest.data)) {
         this.estudiantes = dataest.data
       }
@@ -211,61 +202,62 @@ export default {
       this.editing = true
     },
     saveData(data) {
-      let url = 'grupos/'
-
-      let token = this.$cookie.get(config.cookie.token)
-      var options = {
-        headers: { token: token }
-      }
-      this.loading = true
-      if (this.editing) {
-        url += data.id
-        console.log(data)
-        this.$axios
-          .put(url, data, options)
-          .then(async res => {
-            let data = res
-            if (data.status == 200) {
-              this.dialogCreate = false
-              this.typeMessage = 'info'
-              this.messageInfo = 'Se guardo correctamente'
-              this.currentData = {}
-              this.dialogInfo = true
-              this.loadData()
-            }
-          })
-          .catch(err => {
-            this.typeMessage = 'error'
-            this.messageInfo = 'Hubo un error al guardar'
-          })
-          .finally(() => {
-            this.loading = false
-          })
-        this.loading = false
-      } else {
-        this.$axios
-          .post(url, data, options)
-          .then(async res => {
-            let data = res
-            if (data.status == 200) {
-              this.dialogCreate = false
-              this.typeMessage = 'info'
-              this.messageInfo = 'Se guardo correctamente'
-              this.currentData = {}
-              this.dialogInfo = true
-              this.editing = false
-              this.loadData()
-            }
-          })
-          .catch(err => {
-            this.typeMessage = 'error'
-            this.messageInfo = 'Hubo un error al guardar'
-          })
-          .finally(() => {
-            this.loading = false
-          })
-        this.loading = false
-      }
+      console.log(data);
+      
+      // let url = 'equipos/'
+      // let token = this.$cookie.get(config.cookie.token)
+      // var options = {
+      //   headers: { token: token }
+      // }
+      // this.loading = true
+      // if (this.editing) {
+      //   url += data.id
+      //   console.log(data)
+      //   this.$axios
+      //     .put(url, data, options)
+      //     .then(async res => {
+      //       let data = res
+      //       if (data.status == 200) {
+      //         this.dialogCreate = false
+      //         this.typeMessage = 'info'
+      //         this.messageInfo = 'Se guardo correctamente'
+      //         this.currentData = {}
+      //         this.dialogInfo = true
+      //         this.loadData()
+      //       }
+      //     })
+      //     .catch(err => {
+      //       this.typeMessage = 'error'
+      //       this.messageInfo = 'Hubo un error al guardar'
+      //     })
+      //     .finally(() => {
+      //       this.loading = false
+      //     })
+      //   this.loading = false
+      // } else {
+      //   this.$axios
+      //     .post(url, data, options)
+      //     .then(async res => {
+      //       let data = res
+      //       if (data.status == 200) {
+      //         this.dialogCreate = false
+      //         this.typeMessage = 'info'
+      //         this.messageInfo = 'Se guardo correctamente'
+      //         this.currentData = {}
+      //         this.dialogInfo = true
+      //         this.editing = false
+      //         this.loadData()
+      //       }
+      //     })
+      //     .catch(err => {
+      //       this.typeMessage = 'error'
+      //       this.messageInfo = 'Hubo un error al guardar'
+      //     })
+      //     .finally(() => {
+      //       this.loading = false
+      //     })
+      //   this.loading = false
+      // }
     },
     create() {
       if (this.$refs.formData.validate()) {
@@ -341,8 +333,8 @@ export default {
       this.loading = false
       return response
     },
-    async getAllDataEstudiantes() {
-      let url = 'grupos/'
+    async getAllEstudiantes(id,semestre) {
+      let url = `grupos/estudiantes/${id}/${semestre}`
       let token = this.$cookie.get(config.cookie.token)
       var options = {
         headers: { token: token }
