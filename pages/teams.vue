@@ -18,7 +18,7 @@
         <v-data-table :headers="headersEstudiantes" :items="estudiantesTeam">
           <template slot="items" slot-scope="props">
             <tr>
-              <td>{{ props.item.estudiante }}</td>
+              <td>{{ props.item.nombre }}</td>
             </tr>
           </template>
           <template v-slot:item.action="{ item }">
@@ -254,7 +254,8 @@ export default {
         { text: 'Acciones', value: 'action', sortable: false }
       ],
       headersEstudiantes: [
-        { text: 'Correo', value: 'estudiante' },
+        { text: 'Nombre', value: 'nombre' },
+        { text: 'Correo', value: 'correo' },
         { text: 'Acciones', value: 'action', sortable: false }
       ],
       items: [],
@@ -514,6 +515,10 @@ export default {
     async loadData() {
       let data1 = await this.getAllDataGrupos()
       if (data1.status == 200) {
+        for (let index = 0; index < data1.data.length; index++) {
+          const element = data1.data[index];
+          // element.label = element.
+        }
         this.grupos = data1.data
       }
     },
@@ -529,7 +534,10 @@ export default {
       return response
     },
     async getAllDataGrupos() {
-      let url = 'grupos/profesor/' + this.$cookie.get(config.cookie.usuario)
+      let url = 'grupos/'
+      if (this.$cookie.get(config.cookie.tipo)=='PROFESOR'){
+        url += 'profesor/' + this.$cookie.get(config.cookie.usuario)
+      }
       let token = this.$cookie.get(config.cookie.token)
       var options = {
         headers: { token: token }
