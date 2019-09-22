@@ -10,28 +10,33 @@ let config = {
         {
             icon: 'dashboard',
             title: 'Plantillas Rúbrica',
-            to: routes.rubricBase
+            to: routes.rubricBase,
+            rol:'ADMINISTRADOR-JEFE'
         },
         {
             icon: 'supervisor_account',
             title: 'Grupos',
-            to: routes.groups
+            to: routes.groups,
+            rol:'ADMINISTRADOR-JEFE'
         },
         {
             icon: 'group_work',
             title: 'Equipos',
-            to: routes.teams
+            to: routes.teams,
+            rol:'ADMINISTRADOR-PROFESOR-JEFE'
         },
         {
             icon: 'person',
             title: 'Usuarios',
-            to: routes.users
+            to: routes.users,
+            rol:'ADMINISTRADOR'
         }
           
     ],
     cookie:{
         token :'token',
-        usuario:'usuario'
+        usuario:'usuario',
+        tipo:'tipo'
     }
 }
 

@@ -166,7 +166,7 @@
                               v-for="(item, index) in n.categories"
                               :key="item.name"
                             >
-                              <td>{{ index + 1 }} - {{ item.category }}</td>
+                              <td>{{ item.category }}</td>
                               <td>
                                 <v-simple-table dense>
                                   <tbody>
@@ -174,7 +174,7 @@
                                       v-for="(item2, index) in item.skills"
                                       :key="item2.name"
                                     >
-                                      <td>{{ index + 1 }} -{{ item2.text }}</td>
+                                      <td>{{ item2.text }}</td>
                                       
                                     </tr>
                                   </tbody>
@@ -345,7 +345,7 @@
                               v-for="(item, index) in n.categories"
                               :key="item.name"
                             >
-                              <td>{{ index + 1 }} - {{ item.category }}</td>
+                              <td> {{ item.category }}</td>
                               <td>
                                 <v-simple-table dense>
                                   <tbody>
@@ -353,7 +353,7 @@
                                       v-for="(item2, index) in item.skills"
                                       :key="item2.name"
                                     >
-                                      <td>{{ index + 1 }} -{{ item2.text }}</td>
+                                      <td>{{ item2.text }}</td>
                                     </tr>
                                   </tbody>
                                 </v-simple-table>

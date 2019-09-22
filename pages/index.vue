@@ -110,10 +110,10 @@ export default {
           .post(url, this.currentData,{})
           .then(async res => {
             let data = res
-            console.log(data);
             if(data.status==200){
-              this.$cookie.set(config.cookie.token, data.data.token, 1);
-              this.$cookie.set(config.cookie.usuario, data.data.user.correo, 1);
+              this.$cookie.set(config.cookie.token, data.data.token, 1*24);
+              this.$cookie.set(config.cookie.usuario, data.data.user.correo, 1*24);
+              this.$cookie.set(config.cookie.tipo, data.data.user.tipo, 1*24);
               this.$router.push(routes.home)
             }
             

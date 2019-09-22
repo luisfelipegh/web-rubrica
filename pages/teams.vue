@@ -322,7 +322,7 @@ export default {
         .catch(err => {
           this.dialogInfo =true
           this.typeMessage = 'error'
-          this.messageInfo = 'Hubo un error al guardar'
+          this.messageInfo = 'Hubo un error al guardar, revisa si ya esta en un equipo para el mismo grupo'
           
         })
         .finally(() => {

@@ -14,16 +14,16 @@
           </thead>
           <tbody>
             <tr v-for="(item,index) in current.levels" :key="item.name">
-              <td v-if="item.categories.length!=0">{{index+1}} - {{ item.name }}</td>
+              <td v-if="item.categories.length!=0">{{ item.name }}</td>
               <td>
                 <v-simple-table dense>
-                  <tbody>
+                  <tbody> 
                     <tr v-for="(item2,index) in item.categories" :key="item2.name">
-                      <td>{{index+1}} -{{ item2.category }}</td>
+                      <td>{{ item2.category }}</td>
                       <v-simple-table dense>
                         <tbody>
                           <tr v-for="(item3,index) in item2.skills" :key="item3.index">
-                            <td>{{index+1}} -{{ item3.text }}</td>
+                            <td>{{ item3.text }}</td>
                           </tr>
                         </tbody>
                       </v-simple-table>

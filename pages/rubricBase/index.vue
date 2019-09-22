@@ -13,35 +13,33 @@
     <v-dialog persistent v-model="previewR" v-if="toPreview != undefined">
       <v-card>
         <v-card-title class="headline">Previsualización de la rúbrica</v-card-title>
-        <v-simple-table dense>
+        <table  class="define">
           <thead>
             <tr>
-              <th class="text-left">Nivel</th>
-              <th class="text-left">Categoria</th>
+              <th class="text-left test">Nivel</th>
+              <th class="text-left test">Categoria</th>
             </tr>
           </thead>
-          <tbody>
-            <tr v-for="(item, index) in toPreview.json.levels" :key="item.name">
-              <td v-if="item.categories.length != 0">{{ index + 1 }} - {{ item.name }}</td>
+          <tbody >
+            <tr v-for="(item) in toPreview.json.levels" :key="item.name">
+              <td class="level" v-if="item.categories.length != 0"><b>{{ item.name }}</b></td>
               <td>
-                <v-simple-table dense>
+                <table class="defineCategories">
                   <tbody>
-                    <tr v-for="(item2, index) in item.categories" :key="item2.name">
-                      <td>{{ index + 1 }} -{{ item2.category }}</td>
-                      <v-simple-table dense>
-                        <tbody>
-                          <tr v-for="(item3, index) in item2.skills" :key="item3.index">
-                            <td>{{ index + 1 }} -{{ item3.text }}</td>
-                          </tr>
-                        </tbody>
-                      </v-simple-table>
+                    <tr  v-for="(item2) in item.categories" :key="item2.name">
+                      <td class="labelCat"> <b>{{ item2.category }}</b></td>
+                     
+                          <div class="defineSkills" v-for="(item3) in item2.skills" :key="item3.index">
+                            <span >{{ item3.text }}</span>
+                          </div>
+                     
                     </tr>
                   </tbody>
-                </v-simple-table>
+                </table>
               </td>
             </tr>
           </tbody>
-        </v-simple-table>
+        </table>
         <v-card-actions>
           <div class="flex-grow-1"></div>
           <v-btn
@@ -187,3 +185,30 @@ export default {
   }
 }
 </script>
+<style>
+.level{
+  
+  border-right: 1px solid black;
+  border-top: 2px solid black;
+}
+.define{
+  border: 1px solid black;
+  margin-left: 10%;
+}
+.defineCategories{
+  width:700px;
+}
+.defineSkills{
+  border-bottom: 1px solid black;
+  width: 550px;
+}
+.category{
+  border-right: 1px solid black;
+}
+.labelCat{
+  width: 150px;
+  border-right: 1px solid black !important;
+  border-bottom: 1px solid black !important;
+
+}
+</style>

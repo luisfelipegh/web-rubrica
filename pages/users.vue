@@ -37,6 +37,7 @@
                   required
                   v-model="currentData.correo"
                   label="Correo"
+                  :disabled="editing"
                   name="Correo"
                   :rules="[rules.required, rules.email]"
                   type="text"
@@ -141,7 +142,7 @@ export default {
       dialogInfo: false,
       config: config,
       dialogDelete: false,
-      tipos:[{nombre:'PROFESOR'},{nombre:'ESTUDIANTE'} ],
+      tipos:[{nombre:'PROFESOR'},{nombre:'ESTUDIANTE'} ,{nombre:'ADMINISTRADOR'},{nombre:'JEFE'}],
       headers: [
         { text: 'Correo', value: 'correo' },
         { text: 'Nombre', value: 'nombre' },

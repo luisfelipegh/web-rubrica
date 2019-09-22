@@ -38,7 +38,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="dialogView" persistent max-width="600">
+    <v-dialog v-model="dialogView" persistent max-width="800">
       <v-card>
         <v-card-title class="headline">Ver estudiantes</v-card-title>
         <v-data-table  :headers="headersEstudiantes" :items="estudiantes">
@@ -446,7 +446,7 @@ export default {
         .catch(err => {
           this.dialogDeleteStudent = false
           this.dialogInfo = true
-          this.messageInfo = err
+          this.messageInfo = 'Verifica que el estudiante no este asignado en un equipo'
         })
         .finally(() => {
           this.loading = false
@@ -474,7 +474,7 @@ export default {
         .catch(err => {
           this.dialogDelete = false
           this.dialogInfo = true
-          this.messageInfo = err
+          this.messageInfo = 'Verifica que el grupo no tenga estudiantes / equipos creados'
         })
         .finally(() => {
           this.loading = false
