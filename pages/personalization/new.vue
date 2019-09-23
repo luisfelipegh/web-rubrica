@@ -429,7 +429,7 @@ export default {
     steps(val) {
       if (this.e1 > val) {
         this.e1 = val
-        this.totalNiveles = 
+        // this.totalNiveles = 
       }
     },
     vertical() {
