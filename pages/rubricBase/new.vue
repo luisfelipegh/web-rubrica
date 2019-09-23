@@ -296,7 +296,6 @@
                             <tr>
                               <th class="text-left">Categoría</th>
                               <th class="text-left">Habilidades</th>
-
                               <th class="text-center">Acciones</th>
                             </tr>
                           </thead>
@@ -482,10 +481,7 @@ export default {
         [],
         this.currentData.levels.filter(x => x.categories.length > 0)
       )
-      if (
-        this.currentData.nombre != '' &&
-        levels.length > 0
-      ) {
+      if (this.currentData.nombre != '' && levels.length > 0) {
         let url = 'rubricas/'
         let token = this.$cookie.get(config.cookie.token)
         var options = {
