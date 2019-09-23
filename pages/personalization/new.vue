@@ -26,15 +26,19 @@
           <v-spacer></v-spacer>
           <v-switch v-model="vertical" label="Vista Vertical"></v-switch>
         </v-card-title>
-            <center>Información de la plantilla seleccionada</center>
+        <center>Información de la plantilla seleccionada</center>
         <v-row class="pl-5" v-if="currentData.base">
-            <v-col cols="12" sm="6" md="4">
-              <v-text-field disabled v-model="currentData.base.nombre" label="Nombre de la base"></v-text-field>
-            </v-col>
-            <v-col cols="12" sm="6" md="4">
-              <v-text-field disabled v-model="currentData.base.nombre_creador" label="Nombre del creador"></v-text-field>
-            </v-col>
-          </v-row>
+          <v-col cols="12" sm="6" md="4">
+            <v-text-field disabled v-model="currentData.base.nombre" label="Nombre de la base"></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="6" md="4">
+            <v-text-field
+              disabled
+              v-model="currentData.base.nombre_creador"
+              label="Nombre del creador"
+            ></v-text-field>
+          </v-col>
+        </v-row>
         <v-form ref="form" lazy-validation>
           <v-row class="pl-5">
             <v-col cols="12" sm="6" md="4">
@@ -61,7 +65,6 @@
                           <v-text-field v-model="category" label="Categoría"></v-text-field>
                         </v-col>
                         <v-col cols="12" sm="6" md="6">
-                         
                           <v-combobox
                             v-model="skills"
                             :filter="filter"
@@ -226,7 +229,6 @@
                           <v-text-field v-model="category" label="Categoría"></v-text-field>
                         </v-col>
                         <v-col cols="12" sm="6" md="6">
-                        
                           <v-combobox
                             v-model="skills"
                             :filter="filter"
@@ -293,7 +295,6 @@
                             </template>
                           </v-combobox>
                         </v-col>
-
                         <v-col cols="12" sm="6" md="2">
                           <v-btn
                             class="text-capitalize"
@@ -311,7 +312,6 @@
                             <tr>
                               <th class="text-left">Categoría</th>
                               <th class="text-left">Habilidades</th>
-
                               <th class="text-center">Acciones</th>
                             </tr>
                           </thead>
@@ -323,6 +323,12 @@
                                   <tbody>
                                     <tr v-for="(item2) in item.skills" :key="item2.name">
                                       <td>{{ item2.text }}</td>
+                                      <td>
+                                        <v-text-field
+                                          v-model="item2.porecentaje"
+                                          label="Porcentaje"
+                                        ></v-text-field>
+                                      </td>
                                     </tr>
                                   </tbody>
                                 </v-simple-table>
@@ -341,10 +347,16 @@
                       </v-col>
                     </v-row>
                   </v-container>
+                   
                 </v-card>
+                <row>
+                      <v-col>
+                        <span>Total porcentaje Nivel {{}}</span>
+                      </v-col>
+                    </row>
                 <v-card-actions>
                   <v-row>
-                    <v-col cols="12" sm="12" md="2">
+                    <v-col cols="12" sm="3" md="2">
                       <v-btn
                         class="text-capitalize"
                         color="primary"
@@ -352,7 +364,7 @@
                         @click="nextStep(n.id)"
                       >Agregar Nivel</v-btn>
                     </v-col>
-                    <v-col cols="12" sm="12" md="3">
+                    <v-col cols="12" sm="3" md="3">
                       <v-btn
                         class="text-capitalize"
                         color="primary"
@@ -385,17 +397,18 @@ import config from '@/assets/js/config'
 export default {
   data() {
     return {
-    e1: 1,
+      e1: 1,
       loading: false,
       category: '',
       steps: 0,
-      editable:true,
-      skills:[],
-      search:'',
-        vertical:false,
-        dialogInfo:false,
-        messageInfo:'',
-        currentData : {},
+      editable: true,
+      skills: [],
+      search: '',
+      vertical: false,
+      dialogInfo: false,
+      messageInfo: '',
+      currentData: {},
+      totalNiveles: 0
     }
   },
 
@@ -416,6 +429,7 @@ export default {
     steps(val) {
       if (this.e1 > val) {
         this.e1 = val
+        this.totalNiveles = 
       }
     },
     vertical() {
@@ -426,9 +440,18 @@ export default {
   beforeMount() {
     this.loadData()
   },
+  mounted() {
+    this.loadData()
+  },
   methods: {
-      nextStep(n) {
-      if (n === this.levels) {
+    calcularTotalNivel(n){
+      for (let index = 0; index < array.length; index++) {
+        const element = array[index];
+        
+      }
+    },
+    nextStep(n) {
+      if (n === this.currentData.levels) {
         this.e1 = 1
       } else {
         this.e1 = n + 1
@@ -436,13 +459,21 @@ export default {
     },
     async loadData() {
       let idPlantilla = this.$cookie.get(config.cookie.idPlantilla)
-      if(idPlantilla !=undefined){
-          this.getAllDataPlantillas(idPlantilla)
-        }else{
-          this.$router.push(config.routes.personalization)
+      if (idPlantilla != undefined) {
+        let response = await this.getAllDataPlantillas(idPlantilla)
+        console.log(response)
+        if (response.status == 200) {
+          this.currentData.levels = Object.assign([], response.data.json.levels)
+          this.currentData.base = response.data
+          this.e1 = 2
+          requestAnimationFrame(() => (this.e1 = 1)) // Workarounds
+          this.$forceUpdate()
+        }
+      } else {
+        this.$router.push(config.routes.personalization)
       }
     },
-     async getAllDataPlantillas(id) {
+    async getAllDataPlantillas(id) {
       let url = `rubricas/one/${id}`
       let token = this.$cookie.get(config.cookie.token)
       var options = {
@@ -451,11 +482,7 @@ export default {
       this.loading = true
       let response = await this.$axios.get(url, options)
       this.loading = false
-      if (response.status == 200) {
-          this.currentData.base=response.data
-          this.currentData.levels= Object.assign([],response.data.json.levels)
-      }
-      this.$forceUpdate()
+      return response
     },
     filter(item, queryText, itemText) {
       if (item.header) return false
@@ -469,7 +496,7 @@ export default {
           .toLowerCase()
           .indexOf(query.toString().toLowerCase()) > -1
       )
-    },
+    }
   }
 }
 </script>
