@@ -6,7 +6,7 @@
         <v-card-text>{{ messageInfo }}</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" rounded @click.native="dialogInfo = false">OK</v-btn>
+          <v-btn color="primary" class="text-capitalize" rounded @click.native="dialogInfo = false">OK</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -43,6 +43,7 @@
         <v-card-actions>
           <div class="flex-grow-1"></div>
           <v-btn
+          class="text-capitalize"
             color="primary"
             rounded
             @click="
@@ -60,8 +61,8 @@
         <v-card-text>Al eliminar no se podrá recuperar posteriormente.</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn @click.native="dialogDelete = false" rounded>No</v-btn>
-          <v-btn color="primary" rounded @click.native="confirmDelete()">Sí</v-btn>
+          <v-btn  class="text-capitalize" @click.native="dialogDelete = false" rounded>No</v-btn>
+          <v-btn class="text-capitalize" color="primary" rounded @click.native="confirmDelete()">Sí</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -73,6 +74,7 @@
             Plantillas de Rúbricas
             <v-spacer></v-spacer>
             <v-btn
+            class="text-capitalize"
               color="primary"
               rounded
               @click.stop="$router.push(config.routes.rubricBaseNew)"
@@ -80,13 +82,6 @@
           </v-card-title>
           <v-card-text>
             <v-data-table :headers="headers" :items="items">
-              <template slot="items" slot-scope="props">
-                <tr>
-                  <td>{{ props.item.nombre }}</td>
-                  <td>{{ props.item.semestre }}</td>
-                  <td>{{ props.item.creador }}</td>
-                </tr>
-              </template>
               <template v-slot:item.action="{ item }">
                 <!-- <preview-base :base="item" /> -->
                 <v-icon small class="pr-2" @click="preview(item)">remove_red_eye</v-icon>
@@ -115,7 +110,7 @@ export default {
       headers: [
         { text: 'Nombre', value: 'nombre' },
         { text: 'Semetre', value: 'semestre' },
-        { text: 'Usuario', value: 'creador' },
+        { text: 'Usuario', value: 'nombre_creador' },
         { text: 'Acciones', value: 'action', sortable: false }
       ],
       items: [],
@@ -172,7 +167,7 @@ export default {
       }
     },
     async getAllData() {
-      let url = 'rubricas/'
+      let url = 'rubricas/tipo/BASE'
       let token = this.$cookie.get(config.cookie.token)
       var options = {
         headers: { token: token }

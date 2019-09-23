@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-btn rounded color="primary" @click.stop="prepare()">Ver</v-btn>
+    <v-btn class="text-capitalize" rounded color="primary" @click.stop="prepare()">Ver</v-btn>
 
     <v-dialog persistent v-model="dialog">
       <v-card>
@@ -13,16 +13,16 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item,index) in current.levels" :key="item.name">
+            <tr v-for="(item) in current.levels" :key="item.name">
               <td v-if="item.categories.length!=0">{{ item.name }}</td>
               <td>
                 <v-simple-table dense>
                   <tbody> 
-                    <tr v-for="(item2,index) in item.categories" :key="item2.name">
+                    <tr v-for="(item2) in item.categories" :key="item2.name">
                       <td>{{ item2.category }}</td>
                       <v-simple-table dense>
                         <tbody>
-                          <tr v-for="(item3,index) in item2.skills" :key="item3.index">
+                          <tr v-for="(item3) in item2.skills" :key="item3.index">
                             <td>{{ item3.text }}</td>
                           </tr>
                         </tbody>
@@ -38,7 +38,7 @@
         <v-card-actions>
           <div class="flex-grow-1"></div>
 
-          <v-btn color="primary" rounded @click="dialog = false">Ok</v-btn>
+          <v-btn class="text-capitalize"  color="primary" rounded @click="dialog = false">Ok</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

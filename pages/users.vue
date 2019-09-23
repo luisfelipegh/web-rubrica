@@ -6,7 +6,7 @@
         <v-card-text>{{ messageInfo }}</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" rounded @click.native="dialogInfo = false">OK</v-btn>
+          <v-btn class="text-capitalize" color="primary" rounded @click.native="dialogInfo = false">OK</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -20,9 +20,9 @@
               @change="onChange($event,'file')"
             />
         <v-card-actions>
-            <v-btn color="primary" rounded @click.native="cancelArchivo">Cancelar</v-btn>
+            <v-btn class="text-capitalize" color="primary" rounded @click.native="cancelArchivo">Cancelar</v-btn>
           <v-spacer></v-spacer>
-          <v-btn color="primary" rounded @click.native="subirArchivo">OK</v-btn>
+          <v-btn class="text-capitalize" color="primary" rounded @click.native="subirArchivo">OK</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -73,11 +73,11 @@
         </div>
         <v-card-actions>
           <div class="flex-grow-1"></div>
-          <v-btn color="primary" rounded @click="create()">
+          <v-btn class="text-capitalize" color="primary" rounded @click="create()">
             <v-icon right>save</v-icon>
             {{editing?'Guardar':'Crear'}}
           </v-btn>
-          <v-btn color="primary" rounded @click="cancelCreate()">
+          <v-btn class="text-capitalize" color="primary" rounded @click="cancelCreate()">
             <v-icon right>cancel</v-icon>Cancelar
           </v-btn>
         </v-card-actions>
@@ -90,8 +90,8 @@
         <v-card-text>Al eliminar no se podrá recuperar posteriormente.</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn @click.native="dialogDelete = false" rounded>No</v-btn>
-          <v-btn color="primary" rounded @click.native="confirmDelete()">Sí</v-btn>
+          <v-btn class="text-capitalize" @click.native="dialogDelete = false" rounded>No</v-btn>
+          <v-btn class="text-capitalize" color="primary" rounded @click.native="confirmDelete()">Sí</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -102,18 +102,12 @@
           <v-card-title>
             Creación de Usuarios
             <v-spacer></v-spacer>
-            <v-btn color="primary" rounded @click.native="agregarUsuarios()">Importacion de usuarios</v-btn>
-            <v-btn color="primary" rounded @click.stop="dialogCreateOpen()">Crear Usuario</v-btn>
+            <v-btn class="text-capitalize" color="primary" rounded @click.native="agregarUsuarios()">Importación de usuarios</v-btn>
+            <v-btn class="text-capitalize" color="primary" rounded @click.stop="dialogCreateOpen()">Crear Usuario</v-btn>
           </v-card-title>
           <v-card-text>
             <v-data-table :headers="headers" :items="items">
-              <template slot="items" slot-scope="props">
-                <tr>
-                  <td>{{ props.item.correo }}</td>
-                  <td>{{ props.item.nombre }}</td>
-                  <td>{{ props.item.tipo }}</td>
-                </tr>
-              </template>
+            
               <template v-slot:item.action="{ item }">
                 <v-icon small class="pr-2" @click="editItem(item)">edit</v-icon>
                 <v-icon small @click="deleteItem(item)">delete</v-icon>

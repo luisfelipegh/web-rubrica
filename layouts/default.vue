@@ -24,7 +24,7 @@
 
       <v-menu>
         <template v-slot:activator="{ on }">
-          <v-btn color="primary" dark v-on="on">{{user.nombre}}</v-btn>
+          <v-btn class="text-capitalize" color="primary" dark v-on="on">{{user.nombre}}</v-btn>
         </template>
         <v-list>
           <v-list-item @click="Perfil()">

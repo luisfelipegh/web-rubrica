@@ -7,8 +7,8 @@
         <v-card-text>Al eliminar no se podrá recuperar posteriormente.</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn @click.native="dialogDeleteStudent = false" rounded>No</v-btn>
-          <v-btn color="primary" rounded @click.native="confirmDeleteStudent()">Sí</v-btn>
+          <v-btn class="text-capitalize" @click.native="dialogDeleteStudent = false" rounded>No</v-btn>
+          <v-btn class="text-capitalize" color="primary" rounded @click.native="confirmDeleteStudent()">Sí</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -16,11 +16,6 @@
       <v-card>
         <v-card-title class="headline">Ver estudiantes</v-card-title>
         <v-data-table :headers="headersEstudiantes" :items="estudiantesTeam">
-          <template slot="items" slot-scope="props">
-            <tr>
-              <td>{{ props.item.nombre }}</td>
-            </tr>
-          </template>
           <template v-slot:item.action="{ item }">
             <v-tooltip bottom>
               <template v-slot:activator="{ on }">
@@ -34,7 +29,7 @@
           <template slot="no-data">No se encontraron estudiantes en el equipo</template>
         </v-data-table>
         <v-card-actions>
-          <v-btn color="primary" rounded @click.native="closeView">Cerrar</v-btn>
+          <v-btn class="text-capitalize" color="primary" rounded @click.native="closeView">Cerrar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -44,7 +39,7 @@
         <v-card-text>{{ messageInfo }}</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" rounded @click.native="dialogInfo = false">OK</v-btn>
+          <v-btn class="text-capitalize" color="primary" rounded @click.native="dialogInfo = false">OK</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -75,10 +70,10 @@
         </div>
         <v-card-actions>
           <div class="flex-grow-1"></div>
-          <v-btn color="primary" rounded @click="addStudents()">
+          <v-btn class="text-capitalize" color="primary" rounded @click="addStudents()">
             <v-icon right>save</v-icon>Agregar
           </v-btn>
-          <v-btn color="primary" rounded @click="cancelStudents()">
+          <v-btn class="text-capitalize" color="primary" rounded @click="cancelStudents()">
             <v-icon right>cancel</v-icon>Cancelar
           </v-btn>
         </v-card-actions>
@@ -112,35 +107,15 @@
                 ></v-text-field>
               </v-col>
             </v-row>
-            <v-row class="px-5">
-              <!-- <v-col cols="12" sm="6" md="6">
-              <v-autocomplete
-              label="Selecciona los estudiantes"
-              v-model="currentData.estudiantes"
-              :items="estudiantes"
-              multiple
-              no-data-text="Escribe para buscar "
-              chips
-              clearable
-              hide-selected
-              return-object
-              item-text="nombre"
-            >
-             <template v-slot:no-data>
-                <span>No se encontraron estudiantes</span>
-              </template>
-              </v-autocomplete>
-              </v-col>-->
-            </v-row>
           </v-form>
         </div>
         <v-card-actions>
           <div class="flex-grow-1"></div>
-          <v-btn color="primary" rounded @click="create()">
+          <v-btn class="text-capitalize" color="primary" rounded @click="create()">
             <v-icon right>save</v-icon>
             {{editing?'Guardar':'Crear'}}
           </v-btn>
-          <v-btn color="primary" rounded @click="cancelCreate()">
+          <v-btn class="text-capitalize" color="primary" rounded @click="cancelCreate()">
             <v-icon right>cancel</v-icon>Cancelar
           </v-btn>
         </v-card-actions>
@@ -153,8 +128,8 @@
         <v-card-text>Al eliminar no se podrá recuperar posteriormente.</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn @click.native="dialogDelete = false" rounded>No</v-btn>
-          <v-btn color="primary" rounded @click.native="confirmDelete()">Sí</v-btn>
+          <v-btn class="text-capitalize" @click.native="dialogDelete = false" rounded>No</v-btn>
+          <v-btn class="text-capitalize" color="primary" rounded @click.native="confirmDelete()">Sí</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -166,6 +141,7 @@
             Creación de equipos {{selectedGroup ?selectedGroup.nombre:''}}
             <v-spacer></v-spacer>
             <v-btn
+            class="text-capitalize"
               v-if="selectedGroup!=undefined"
               color="primary"
               rounded
@@ -183,12 +159,7 @@
             ></v-autocomplete>
             <div v-if="selectedGroup!=undefined">
               <v-data-table :loading="loading" :headers="headers" :items="items">
-                <template slot="items" slot-scope="props">
-                  <tr>
-                    <td>{{ props.item.codigo }}</td>
-                    <td>{{ props.item.nombre }}</td>
-                  </tr>
-                </template>
+              
                 <template v-slot:item.action="{ item }">
                   <v-tooltip bottom>
                     <template v-slot:activator="{ on }">

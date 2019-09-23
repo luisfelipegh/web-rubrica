@@ -14,6 +14,12 @@ let config = {
             rol:'ADMINISTRADOR-JEFE'
         },
         {
+            icon: 'view_quilt',
+            title: 'Personalizar',
+            to: routes.personalization,
+            rol:'ADMINISTRADOR-PROFESOR-JEFE'
+        },
+        {
             icon: 'supervisor_account',
             title: 'Grupos',
             to: routes.groups,
@@ -34,6 +40,7 @@ let config = {
           
     ],
     cookie:{
+        idPlantilla:'idPlantilla',
         token :'token',
         usuario:'usuario',
         tipo:'tipo'
