@@ -42,7 +42,7 @@
         <v-form ref="form" lazy-validation>
           <v-row class="pl-5">
             <v-col cols="12" sm="6" md="4">
-              <v-text-field required v-model="currentData.nombre" label="Nombre de la rúbrica"></v-text-field>
+              <v-text-field required v-model="currentData.nombre" label="Nombre Personalizado"></v-text-field>
             </v-col>
           </v-row>
         </v-form>
@@ -216,7 +216,7 @@
             </v-stepper-header>
             <v-stepper-items>
               <v-stepper-content
-                v-for="n in currentData.levels"
+                v-for="(n,index) in currentData.levels"
                 :key="`${n.id}-content`"
                 :step="n.id"
               >
@@ -316,16 +316,20 @@
                             </tr>
                           </thead>
                           <tbody>
-                            <tr v-for="(item) in n.categories" :key="item.name">
+                            <tr v-for="(item,index2) in n.categories" :key="item.name">
                               <td>{{ item.category }}</td>
                               <td>
                                 <v-simple-table dense>
                                   <tbody>
-                                    <tr v-for="(item2) in item.skills" :key="item2.name">
-                                      <td>{{ item2.text }}</td>
+                                    <tr v-for="(item2,index3) in item.skills" :key="item2.name">
+                                      <td class="tempo">{{ item2.text }}</td>
                                       <td>
                                         <v-text-field
-                                          v-model="item2.porecentaje"
+                                          type="number"
+                                          :min="0"
+                                          :max="100"
+                                          @change="changePorcentaje(index,index2,index3)"
+                                          v-model="item2.porcentaje"
                                           label="Porcentaje"
                                         ></v-text-field>
                                       </td>
@@ -347,23 +351,14 @@
                       </v-col>
                     </v-row>
                   </v-container>
-                   
                 </v-card>
-                <row>
-                      <v-col>
-                        <span>Total porcentaje Nivel {{}}</span>
-                      </v-col>
-                    </row>
+                <row v-if="n.totalNivel>0">
+                  <v-col>
+                    <span>{{n.totalNivel}} % Para el nivel {{ n.name }}</span>
+                  </v-col>
+                </row>
                 <v-card-actions>
                   <v-row>
-                    <v-col cols="12" sm="3" md="2">
-                      <v-btn
-                        class="text-capitalize"
-                        color="primary"
-                        rounded
-                        @click="nextStep(n.id)"
-                      >Agregar Nivel</v-btn>
-                    </v-col>
                     <v-col cols="12" sm="3" md="3">
                       <v-btn
                         class="text-capitalize"
@@ -372,6 +367,14 @@
                         @click="ClearCategory(n)"
                       >Limpiar Nivel</v-btn>
                     </v-col>
+                    <v-col cols="12" sm="3" md="2">
+                      <v-btn
+                        class="text-capitalize"
+                        color="primary"
+                        rounded
+                        @click="nextStep(n.id)"
+                      >Agregar Nivel</v-btn>
+                    </v-col>
                   </v-row>
                 </v-card-actions>
               </v-stepper-content>
@@ -379,6 +382,7 @@
           </template>
         </v-stepper>
         <v-card-actions>
+          <span>Total de porcentaje es {{currentData.totalPorcentaje}} %</span>
           <v-spacer></v-spacer>
           <v-btn
             class="ml-3 text-capitalize"
@@ -408,7 +412,7 @@ export default {
       dialogInfo: false,
       messageInfo: '',
       currentData: {},
-      totalNiveles: 0
+      routeIndexRubric : onfig.routes.personalization,
     }
   },
 
@@ -429,7 +433,6 @@ export default {
     steps(val) {
       if (this.e1 > val) {
         this.e1 = val
-        // this.totalNiveles = 
       }
     },
     vertical() {
@@ -437,6 +440,7 @@ export default {
       requestAnimationFrame(() => (this.e1 = 1)) // Workarounds
     }
   },
+
   beforeMount() {
     this.loadData()
   },
@@ -444,10 +448,161 @@ export default {
     this.loadData()
   },
   methods: {
-    calcularTotalNivel(n){
+     closeDialog() {
+      if (this.typeMessage == 'error') {
+        this.dialogInfo = false
+        this.messageInfo = ''
+      }
+      if (this.typeMessage == 'info') {
+        this.dialogInfo = false
+        this.$router.push(this.routeIndexRubric)
+        this.messageInfo = ''
+      }
+    },
+    ClearCategory(level) {
+      let level_modify = this.currentData.levels.find(x => x.id === level.id)
+      level_modify.categories = []
+      this.$forceUpdate()
+    },
+    aggregateItem(item) {
+      if (this.category != '' && this.skills.length > 0) {
+        let new_category = {
+          category: this.category,
+          skills: this.skills,
+          action: ''
+        }
+        let level_modify = this.currentData.levels.find(x => x.id === item.id)
+        level_modify.categories.push(new_category)
+        this.category = ''
+        this.skills = []
+      }
+       this.calculateNewPorcentajes()
+       this.$forceUpdate()
+    },
+    editItem(n, item) {
+      let level_modify = this.currentData.levels.find(x => x.id === n.id)
+      let i = level_modify.categories.indexOf(item)
+      this.skills = level_modify.categories[i].skills
+      this.category = level_modify.categories[i].category
+      if (i !== -1) {
+        level_modify.categories.splice(i, 1)
+      }
+    },
+    deleteItem(n, item) {
+      let level_modify = this.currentData.levels.find(x => x.id === n.id)
+      var i = level_modify.categories.indexOf(item)
+      if (i !== -1) {
+        level_modify.categories.splice(i, 1)
+      }
+      this. calculateNewPorcentajes()
+      this.$forceUpdate()
+    },
+    calculateNewPorcentajes(){
+      let total= 0
+      for (let index = 0; index < this.currentData.levels.length; index++) {
+        const element = this.currentData.levels[index]
+        let totalnivel = 0
+        for (let index2 = 0; index2 < element.categories.length; index2++) {
+          const element2 = element.categories[index2]
+          let totalCategory = 0 
+          for (let index3 = 0; index3 < element2.skills.length; index3++) {
+            const element3 = element2.skills[index3]
+            if (element3.porcentaje && element3.porcentaje <= 100) {
+              total = total + parseFloat(element3.porcentaje)
+              totalnivel = totalnivel + parseFloat(element3.porcentaje)
+              totalCategory = totalCategory + parseFloat(element3.porcentaje)
+            }
+          }
+          element2.totalCategory = totalCategory
+        }
+        element.totalNivel = totalnivel
+      }
+       this.currentData.totalPorcentaje = total
+    },
+    changePorcentaje(n, index2, index3) {
+      if (
+        parseFloat(
+          this.currentData.levels[n].categories[index2].skills[index3]
+            .porcentaje
+        ) < 1 ||
+        parseFloat(
+          this.currentData.levels[n].categories[index2].skills[index3]
+            .porcentaje
+        ) > 100
+      ) {
+        this.messageInfo =
+          'Los porcentajes son incorrectos mínimo 1, máximo 100'
+        this.dialogInfo = true
+        this.currentData.levels[n].categories[index2].skills[
+          index3
+        ].porcentaje = 0
+      }
+      let total = 0
+      for (let index = 0; index < this.currentData.levels.length; index++) {
+        const element = this.currentData.levels[index]
+        let totalnivel = 0
+        for (let index2 = 0; index2 < element.categories.length; index2++) {
+          const element2 = element.categories[index2]
+          let totalCategory = 0 
+          for (let index3 = 0; index3 < element2.skills.length; index3++) {
+            const element3 = element2.skills[index3]
+            if (element3.porcentaje && element3.porcentaje <= 100) {
+              total = total + parseFloat(element3.porcentaje)
+              totalnivel = totalnivel + parseFloat(element3.porcentaje)
+              totalCategory = totalCategory + parseFloat(element3.porcentaje)
+            }
+          }
+          element2.totalCategory = totalCategory
+        }
+        element.totalNivel = totalnivel
+      }
+      if (total > 100) {
+        this.messageInfo = 'Los porcentajes ingresados estan excediento el 100%'
+        this.dialogInfo = true
+        this.currentData.levels[n].totalNivel =
+          this.currentData.levels[n].totalNivel -
+          parseFloat(
+            this.currentData.levels[n].categories[index2].skills[index3]
+              .porcentaje
+          )
+        this.currentData.levels[n].categories[index2].skills[
+          index3
+        ].porcentaje = 0
+      } else {
+        this.currentData.totalPorcentaje = total
+      }
+
+      this.$forceUpdate()
+    },
+    validarPorcentajes() {
+      let total = 0
+      for (let index = 0; index < this.currentData.levels.length; index++) {
+        const element = this.currentData.levels[index]
+        let totalnivel = 0
+        for (let index2 = 0; index2 < element.categories.length; index2++) {
+          const element2 = element.categories[index2]
+          for (let index3 = 0; index3 < element2.skills.length; index3++) {
+            const element3 = element2.skills[index3]
+            if (element3.porcentaje) {
+              total = total + parseFloat(element3.porcentaje)
+              totalnivel = totalnivel + parseFloat(element3.porcentaje)
+            }else{
+              return false
+            }
+          }
+        }
+        element.totalNivel = totalnivel
+      }
+      if (total == 100) {
+        return true
+      } else {
+        return false
+      }
+    },
+
+    calcularTotalNivel(n) {
       for (let index = 0; index < array.length; index++) {
-        const element = array[index];
-        
+        const element = array[index]
       }
     },
     nextStep(n) {
@@ -484,6 +639,57 @@ export default {
       this.loading = false
       return response
     },
+
+    saveData() {
+      if (this.validarPorcentajes()) {
+        console.log(this.currentData.levels);
+        let levels = Object.assign(
+        [],
+        this.currentData.levels.filter(x => x.categories.length > 0)
+      )
+      if (this.currentData.nombre != undefined && levels.length > 0) {
+        let url = 'rubricas/'
+        let token = this.$cookie.get(config.cookie.token)
+        var options = {
+          headers: { token: token }
+        }
+        this.loading = true
+        this.currentData.creador = this.$cookie.get(config.cookie.usuario)
+        
+        let data = {
+          json: Object.assign({}, this.currentData),
+          nombre: this.currentData.nombre,
+          creador: this.$cookie.get(config.cookie.usuario),
+          tipo :'PERSONALIZADA'
+        }
+        data.json.levels = levels
+        this.$axios
+          .post(url, data, options)
+          .then(async res => {
+            let data = res
+            if (data.status == 200) {
+              this.typeMessage = 'info'
+              this.messageInfo = 'Se guardo correctamente'
+              this.dialogInfo = true
+            }
+          })
+          .catch(err => {
+            console.log(err)
+          })
+          .finally(() => {
+            this.loading = false
+          })
+        this.loading = false
+      } else {
+        this.messageInfo = 'Error por favor revisa los campos'
+        this.dialogInfo = true
+        this.typeMessage = 'error'
+      }
+      } else {
+        this.messageInfo="Válida por favor que las categorias cargadas tengan un porcentaje, por el contrario eliminarlo, valida de el porcentaje sea igual a 100%"
+        this.dialogInfo=true
+      }
+    },
     filter(item, queryText, itemText) {
       if (item.header) return false
       const hasValue = val => (val != null ? val : '')
@@ -500,3 +706,9 @@ export default {
   }
 }
 </script>
+
+<style>
+.tempo {
+  max-width: 300px;
+}
+</style>

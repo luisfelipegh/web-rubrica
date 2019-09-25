@@ -1,6 +1,64 @@
 
 <template>
   <div>
+      <!-- DIALOGO ELIMINAR -->
+    <v-dialog v-model="dialogDelete" persistent max-width="290">
+      <v-card>
+        <v-card-title class="headline">¿Desea eliminar el dato seleccionado?</v-card-title>
+        <v-card-text>Al eliminar no se podrá recuperar posteriormente.</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn  class="text-capitalize" @click.native="dialogDelete = false" rounded>No</v-btn>
+          <v-btn class="text-capitalize" color="primary" rounded @click.native="confirmDelete()">Sí</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog persistent v-model="previewR" v-if="toPreview != undefined">
+      <v-card>
+        <v-card-title class="headline">Previsualización de la rúbrica</v-card-title>
+        <v-simple-table dense  lass="define">
+          <thead>
+            <tr>
+              <th class="text-left test">Nivel</th>
+              <th class="text-left test">Categoria</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item) in toPreview.json.levels" :key="item.name">
+              <td class="levelPerso" v-if="item.categories.length != 0"><b>{{ item.name }}</b> <br>{{item.totalNivel}}%</td>
+              <td>
+                <table class="defineCategories">
+                  <tbody>
+                    <tr  v-for="(item2) in item.categories" :key="item2.name">
+                      <td class="labelCatPerso"> <b>{{ item2.category }}</b><br>{{item2.totalCategory}}%</td>
+                          <div class="defineSkills" v-for="(item3) in item2.skills" :key="item3.index">
+                            <span >{{ item3.text }} </span><br>
+                            <b >{{ item3.porcentaje }} %</b>
+                          </div>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </v-simple-table >
+       <span>
+       Porcentaje Total {{toPreview.json.totalPorcentaje}} %
+       </span>
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+          <v-btn
+          class="text-capitalize"
+            color="primary"
+            rounded
+            @click="
+              previewR = false
+              toPreview = undefined
+            "
+          >Ok</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-dialog v-model="dialogInfo" persistent max-width="290">
       <v-card>
         <v-card-title class="headline">Mensaje</v-card-title>
@@ -85,14 +143,16 @@ export default {
       dialogInfo: false,
       headers: [
         { text: 'Nombre', value: 'nombre' },
-        { text: 'Semetre', value: 'semestre' },
         { text: 'Usuario', value: 'nombre_creador' },
         { text: 'Acciones', value: 'action', sortable: false }
       ],
       items: [],
       bases: [],
       loading: false,
-      dialogCreate: false
+      dialogCreate: false,
+      toPreview: undefined,
+      previewR: false,
+      dialogDelete:false
     }
   },
   beforeMount() {
@@ -100,6 +160,42 @@ export default {
     this.getAllDataPlantillas()
   },
   methods: {
+      deleteItem(item) {
+      this.dialogDelete = true
+      this.toDelete = item
+    },
+    confirmDelete() {
+      let url = 'rubricas/' + this.toDelete.id
+      let token = this.$cookie.get(config.cookie.token)
+      var options = {
+        headers: { token: token }
+      }
+      this.loading = true
+      this.$axios
+        .delete(url, options)
+        .then(async res => {
+            let data = res
+          if (data.status == 200) {
+            this.dialogDelete = false
+            this.dialogInfo = true
+            this.messageInfo = data.data.info
+            this.loadData()
+          }
+        })
+        .catch(err => {
+          this.dialogDelete = false
+          this.dialogInfo = true
+          this.messageInfo = err
+        })
+        .finally(() => {
+          this.loading = false
+        })
+      this.loading = false
+    },
+    preview(item) {
+      this.toPreview = item
+      this.previewR = true
+    },
     toCreate() {
       if (this.$refs.formData.validate()) {
            this.$cookie.set(config.cookie.idPlantilla,this.currentData.toCreate.id)
@@ -146,3 +242,11 @@ export default {
   }
 }
 </script>
+<style>
+.levelPerso{
+width: 150px;
+}
+.labelCatPerso{
+width: 200px;
+}
+</style>

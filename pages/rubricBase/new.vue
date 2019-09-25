@@ -494,8 +494,6 @@ export default {
           nombre: this.currentData.nombre,
           creador: this.$cookie.get(config.cookie.usuario)
         }
-        console.log(data)
-
         data.json.levels = levels
         this.$axios
           .post(url, data, options)
@@ -508,7 +506,6 @@ export default {
             }
           })
           .catch(err => {
-            console.log(err)
           })
           .finally(() => {
             this.loading = false
