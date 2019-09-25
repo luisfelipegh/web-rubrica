@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.3.6",
-    "nuxt": "^2.6.2",
+    "npx": "^10.2.0",
+    "nuxt": "^2.9.2",
     "vue-cookie": "^1.1.4"
   },
   "devDependencies": {
