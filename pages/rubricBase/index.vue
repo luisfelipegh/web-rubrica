@@ -13,7 +13,7 @@
     <v-dialog persistent v-model="previewR" v-if="toPreview != undefined">
       <v-card>
         <v-card-title class="headline">Previsualización de la rúbrica</v-card-title>
-        <table  class="define">
+        <<v-simple-table  class="define">
           <thead>
             <tr>
               <th class="text-left test">Nivel</th>
@@ -28,18 +28,16 @@
                   <tbody>
                     <tr  v-for="(item2) in item.categories" :key="item2.name">
                       <td class="labelCat"> <b>{{ item2.category }}</b></td>
-                     
                           <div class="defineSkills" v-for="(item3) in item2.skills" :key="item3.index">
                             <span >{{ item3.text }}</span>
                           </div>
-                     
                     </tr>
                   </tbody>
                 </table>
               </td>
             </tr>
           </tbody>
-        </table>
+        </v-simple-table>
         <v-card-actions>
           <div class="flex-grow-1"></div>
           <v-btn
@@ -182,28 +180,9 @@ export default {
 </script>
 <style>
 .level{
-  
-  border-right: 1px solid black;
-  border-top: 2px solid black;
-}
-.define{
-  border: 1px solid black;
-  margin-left: 10%;
-}
-.defineCategories{
-  width:700px;
-}
-.defineSkills{
-  border-bottom: 1px solid black;
-  width: 550px;
-}
-.category{
-  border-right: 1px solid black;
+width: 150px;
 }
 .labelCat{
-  width: 150px;
-  border-right: 1px solid black !important;
-  border-bottom: 1px solid black !important;
-
+width: 200px;
 }
 </style>
