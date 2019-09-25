@@ -1,28 +1,48 @@
+
 <template>
-  <v-layout justify-center align-center>
+  <div>
     <v-dialog v-model="dialogInfo" persistent max-width="290">
       <v-card>
         <v-card-title class="headline">Mensaje</v-card-title>
-        <v-card-text>{{messageInfo}}</v-card-text>
+        <v-card-text>{{ messageInfo }}</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" rounded @click.native="closeDialog()">OK</v-btn>
+          <v-btn
+            color="primary"
+            class="text-capitalize"
+            rounded
+            @click.native="dialogInfo = false"
+          >OK</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
+
     <v-flex xs12 sm12 md12>
       <v-card>
         <v-card-title class="headline">
           <strong>
-            <center>Creación de la Rúbrica</center>
+            <center>Personalización de la Rúbrica</center>
           </strong>
           <v-spacer></v-spacer>
           <v-switch v-model="vertical" label="Vista Vertical"></v-switch>
         </v-card-title>
+        <center>Información de la plantilla seleccionada</center>
+        <v-row class="pl-5" v-if="currentData.base">
+          <v-col cols="12" sm="6" md="4">
+            <v-text-field disabled v-model="currentData.base.nombre" label="Nombre de la base"></v-text-field>
+          </v-col>
+          <v-col cols="12" sm="6" md="4">
+            <v-text-field
+              disabled
+              v-model="currentData.base.nombre_creador"
+              label="Nombre del creador"
+            ></v-text-field>
+          </v-col>
+        </v-row>
         <v-form ref="form" lazy-validation>
           <v-row class="pl-5">
             <v-col cols="12" sm="6" md="4">
-              <v-text-field required v-model="currentData.nombre" label="Nombre de la rúbrica"></v-text-field>
+              <v-text-field required v-model="currentData.nombre" label="Nombre Personalizado"></v-text-field>
             </v-col>
           </v-row>
         </v-form>
@@ -45,7 +65,6 @@
                           <v-text-field v-model="category" label="Categoría"></v-text-field>
                         </v-col>
                         <v-col cols="12" sm="6" md="6">
-                          <!-- -->
                           <v-combobox
                             v-model="skills"
                             :filter="filter"
@@ -195,10 +214,9 @@
                 <v-divider v-if="n.id !== steps" :key="n.id"></v-divider>
               </template>
             </v-stepper-header>
-
             <v-stepper-items>
               <v-stepper-content
-                v-for="n in currentData.levels"
+                v-for="(n,index) in currentData.levels"
                 :key="`${n.id}-content`"
                 :step="n.id"
               >
@@ -211,7 +229,6 @@
                           <v-text-field v-model="category" label="Categoría"></v-text-field>
                         </v-col>
                         <v-col cols="12" sm="6" md="6">
-                          <!-- -->
                           <v-combobox
                             v-model="skills"
                             :filter="filter"
@@ -278,7 +295,6 @@
                             </template>
                           </v-combobox>
                         </v-col>
-
                         <v-col cols="12" sm="6" md="2">
                           <v-btn
                             class="text-capitalize"
@@ -300,13 +316,23 @@
                             </tr>
                           </thead>
                           <tbody>
-                            <tr v-for="(item) in n.categories" :key="item.name">
+                            <tr v-for="(item,index2) in n.categories" :key="item.name">
                               <td>{{ item.category }}</td>
                               <td>
                                 <v-simple-table dense>
                                   <tbody>
-                                    <tr v-for="(item2) in item.skills" :key="item2.name">
-                                      <td>{{ item2.text }}</td>
+                                    <tr v-for="(item2,index3) in item.skills" :key="item2.name">
+                                      <td class="tempo">{{ item2.text }}</td>
+                                      <td>
+                                        <v-text-field
+                                          type="number"
+                                          :min="0"
+                                          :max="100"
+                                          @change="changePorcentaje(index,index2,index3)"
+                                          v-model="item2.porcentaje"
+                                          label="Porcentaje"
+                                        ></v-text-field>
+                                      </td>
                                     </tr>
                                   </tbody>
                                 </v-simple-table>
@@ -326,23 +352,28 @@
                     </v-row>
                   </v-container>
                 </v-card>
+                <row v-if="n.totalNivel>0">
+                  <v-col>
+                    <span>{{n.totalNivel}} % Para el nivel {{ n.name }}</span>
+                  </v-col>
+                </row>
                 <v-card-actions>
                   <v-row>
-                    <v-col cols="12" sm="12" md="2">
-                      <v-btn
-                        class="text-capitalize"
-                        color="primary"
-                        rounded
-                        @click="nextStep(n.id)"
-                      >Agregar Nivel</v-btn>
-                    </v-col>
-                    <v-col cols="12" sm="12" md="3">
+                    <v-col cols="12" sm="3" md="3">
                       <v-btn
                         class="text-capitalize"
                         color="primary"
                         rounded
                         @click="ClearCategory(n)"
                       >Limpiar Nivel</v-btn>
+                    </v-col>
+                    <v-col cols="12" sm="3" md="2">
+                      <v-btn
+                        class="text-capitalize"
+                        color="primary"
+                        rounded
+                        @click="nextStep(n.id)"
+                      >Agregar Nivel</v-btn>
                     </v-col>
                   </v-row>
                 </v-card-actions>
@@ -351,8 +382,8 @@
           </template>
         </v-stepper>
         <v-card-actions>
+          <span>Total de porcentaje es {{currentData.totalPorcentaje}} %</span>
           <v-spacer></v-spacer>
-          <preview-base :base="currentData" />
           <v-btn
             class="ml-3 text-capitalize"
             color="primary"
@@ -362,81 +393,26 @@
         </v-card-actions>
       </v-card>
     </v-flex>
-  </v-layout>
+  </div>
 </template>
-
 <script>
 import config from '@/assets/js/config'
-import previewBase from '@/components/previewBase'
+
 export default {
-  components: {
-    previewBase
-  },
   data() {
     return {
-      routeIndexRubric: config.routes.rubricBase,
-      messageInfo: '',
-      typeMessage: '',
-      dialogInfo: false,
-      headers: [
-        { text: 'Categoria', value: 'category' },
-        { text: 'Habilidades', value: 'skills' },
-        { text: 'Acciones', value: 'action' }
-      ],
       e1: 1,
       loading: false,
-      steps: 0,
-      //
-      activator: null,
-      attach: null,
-      colors: ['green', 'purple', 'indigo', 'cyan', 'teal', 'orange'],
-      editing: null,
-      index: -1,
-      nonce: 1,
-      menu: false,
-      x: 0,
-      search: null,
-      y: 0,
-      //
-      skills: [],
       category: '',
+      steps: 0,
       editable: true,
-      vertical: true,
-      currentData: {
-        nombre: '',
-        levels: [
-          {
-            id: 1,
-            name: 'Conocimiento',
-            categories: []
-          },
-          {
-            id: 2,
-            name: 'Comprensión',
-            categories: []
-          },
-          {
-            id: 3,
-            name: 'Sintesis',
-            categories: []
-          },
-          {
-            id: 4,
-            name: 'Aplicación',
-            categories: []
-          },
-          {
-            id: 5,
-            name: 'Análisis',
-            categories: []
-          },
-          {
-            id: 6,
-            name: 'Evaluación',
-            categories: []
-          }
-        ]
-      }
+      skills: [],
+      search: '',
+      vertical: false,
+      dialogInfo: false,
+      messageInfo: '',
+      currentData: {},
+      routeIndexRubric : onfig.routes.personalization,
     }
   },
 
@@ -464,8 +440,15 @@ export default {
       requestAnimationFrame(() => (this.e1 = 1)) // Workarounds
     }
   },
+
+  beforeMount() {
+    this.loadData()
+  },
+  mounted() {
+    this.loadData()
+  },
   methods: {
-    closeDialog() {
+     closeDialog() {
       if (this.typeMessage == 'error') {
         this.dialogInfo = false
         this.messageInfo = ''
@@ -476,72 +459,25 @@ export default {
         this.messageInfo = ''
       }
     },
-    saveData() {
-      let levels = Object.assign(
-        [],
-        this.currentData.levels.filter(x => x.categories.length > 0)
-      )
-      if (this.currentData.nombre != '' && levels.length > 0) {
-        let url = 'rubricas/'
-        let token = this.$cookie.get(config.cookie.token)
-        var options = {
-          headers: { token: token }
-        }
-        this.loading = true
-        this.currentData.creador = this.$cookie.get(config.cookie.usuario)
-        let data = {
-          json: Object.assign({}, this.currentData),
-          nombre: this.currentData.nombre,
-          creador: this.$cookie.get(config.cookie.usuario)
-        }
-        data.json.levels = levels
-        this.$axios
-          .post(url, data, options)
-          .then(async res => {
-            let data = res
-            if (data.status == 200) {
-              this.typeMessage = 'info'
-              this.messageInfo = 'Se guardo correctamente'
-              this.dialogInfo = true
-            }
-          })
-          .catch(err => {
-          })
-          .finally(() => {
-            this.loading = false
-          })
-        this.loading = false
-      } else {
-        this.messageInfo = 'Error por favor revisa los campos'
-        this.dialogInfo = true
-        this.typeMessage = 'error'
-      }
-    },
-    edit(index, item) {
-      if (!this.editing) {
-        this.editing = item
-        this.index = index
-      } else {
-        this.editing = null
-        this.index = -1
-      }
-    },
-    filter(item, queryText, itemText) {
-      if (item.header) return false
-      const hasValue = val => (val != null ? val : '')
-      const text = hasValue(itemText)
-      const query = hasValue(queryText)
-
-      return (
-        text
-          .toString()
-          .toLowerCase()
-          .indexOf(query.toString().toLowerCase()) > -1
-      )
-    },
     ClearCategory(level) {
       let level_modify = this.currentData.levels.find(x => x.id === level.id)
       level_modify.categories = []
+      this.$forceUpdate()
+    },
+    aggregateItem(item) {
+      if (this.category != '' && this.skills.length > 0) {
+        let new_category = {
+          category: this.category,
+          skills: this.skills,
+          action: ''
+        }
+        let level_modify = this.currentData.levels.find(x => x.id === item.id)
+        level_modify.categories.push(new_category)
+        this.category = ''
+        this.skills = []
+      }
+       this.calculateNewPorcentajes()
+       this.$forceUpdate()
     },
     editItem(n, item) {
       let level_modify = this.currentData.levels.find(x => x.id === n.id)
@@ -558,42 +494,221 @@ export default {
       if (i !== -1) {
         level_modify.categories.splice(i, 1)
       }
+      this. calculateNewPorcentajes()
+      this.$forceUpdate()
     },
-    aggregateItem(item) {
-      if (this.category != '' && this.skills.length > 0) {
-        let new_category = {
-          category: this.category,
-          skills: this.skills,
-          action: ''
+    calculateNewPorcentajes(){
+      let total= 0
+      for (let index = 0; index < this.currentData.levels.length; index++) {
+        const element = this.currentData.levels[index]
+        let totalnivel = 0
+        for (let index2 = 0; index2 < element.categories.length; index2++) {
+          const element2 = element.categories[index2]
+          let totalCategory = 0 
+          for (let index3 = 0; index3 < element2.skills.length; index3++) {
+            const element3 = element2.skills[index3]
+            if (element3.porcentaje && element3.porcentaje <= 100) {
+              total = total + parseFloat(element3.porcentaje)
+              totalnivel = totalnivel + parseFloat(element3.porcentaje)
+              totalCategory = totalCategory + parseFloat(element3.porcentaje)
+            }
+          }
+          element2.totalCategory = totalCategory
         }
-        let level_modify = this.currentData.levels.find(x => x.id === item.id)
-        level_modify.categories.push(new_category)
-        this.category = ''
-        this.skills = []
+        element.totalNivel = totalnivel
+      }
+       this.currentData.totalPorcentaje = total
+    },
+    changePorcentaje(n, index2, index3) {
+      if (
+        parseFloat(
+          this.currentData.levels[n].categories[index2].skills[index3]
+            .porcentaje
+        ) < 1 ||
+        parseFloat(
+          this.currentData.levels[n].categories[index2].skills[index3]
+            .porcentaje
+        ) > 100
+      ) {
+        this.messageInfo =
+          'Los porcentajes son incorrectos mínimo 1, máximo 100'
+        this.dialogInfo = true
+        this.currentData.levels[n].categories[index2].skills[
+          index3
+        ].porcentaje = 0
+      }
+      let total = 0
+      for (let index = 0; index < this.currentData.levels.length; index++) {
+        const element = this.currentData.levels[index]
+        let totalnivel = 0
+        for (let index2 = 0; index2 < element.categories.length; index2++) {
+          const element2 = element.categories[index2]
+          let totalCategory = 0 
+          for (let index3 = 0; index3 < element2.skills.length; index3++) {
+            const element3 = element2.skills[index3]
+            if (element3.porcentaje && element3.porcentaje <= 100) {
+              total = total + parseFloat(element3.porcentaje)
+              totalnivel = totalnivel + parseFloat(element3.porcentaje)
+              totalCategory = totalCategory + parseFloat(element3.porcentaje)
+            }
+          }
+          element2.totalCategory = totalCategory
+        }
+        element.totalNivel = totalnivel
+      }
+      if (total > 100) {
+        this.messageInfo = 'Los porcentajes ingresados estan excediento el 100%'
+        this.dialogInfo = true
+        this.currentData.levels[n].totalNivel =
+          this.currentData.levels[n].totalNivel -
+          parseFloat(
+            this.currentData.levels[n].categories[index2].skills[index3]
+              .porcentaje
+          )
+        this.currentData.levels[n].categories[index2].skills[
+          index3
+        ].porcentaje = 0
+      } else {
+        this.currentData.totalPorcentaje = total
+      }
+
+      this.$forceUpdate()
+    },
+    validarPorcentajes() {
+      let total = 0
+      for (let index = 0; index < this.currentData.levels.length; index++) {
+        const element = this.currentData.levels[index]
+        let totalnivel = 0
+        for (let index2 = 0; index2 < element.categories.length; index2++) {
+          const element2 = element.categories[index2]
+          for (let index3 = 0; index3 < element2.skills.length; index3++) {
+            const element3 = element2.skills[index3]
+            if (element3.porcentaje) {
+              total = total + parseFloat(element3.porcentaje)
+              totalnivel = totalnivel + parseFloat(element3.porcentaje)
+            }else{
+              return false
+            }
+          }
+        }
+        element.totalNivel = totalnivel
+      }
+      if (total == 100) {
+        return true
+      } else {
+        return false
       }
     },
-    onInput(val) {
-      this.currentData.levels = parseInt(val)
+
+    calcularTotalNivel(n) {
+      for (let index = 0; index < array.length; index++) {
+        const element = array[index]
+      }
     },
     nextStep(n) {
-      if (n === this.levels) {
+      if (n === this.currentData.levels) {
         this.e1 = 1
       } else {
         this.e1 = n + 1
       }
+    },
+    async loadData() {
+      let idPlantilla = this.$cookie.get(config.cookie.idPlantilla)
+      if (idPlantilla != undefined) {
+        let response = await this.getAllDataPlantillas(idPlantilla)
+        console.log(response)
+        if (response.status == 200) {
+          this.currentData.levels = Object.assign([], response.data.json.levels)
+          this.currentData.base = response.data
+          this.e1 = 2
+          requestAnimationFrame(() => (this.e1 = 1)) // Workarounds
+          this.$forceUpdate()
+        }
+      } else {
+        this.$router.push(config.routes.personalization)
+      }
+    },
+    async getAllDataPlantillas(id) {
+      let url = `rubricas/one/${id}`
+      let token = this.$cookie.get(config.cookie.token)
+      var options = {
+        headers: { token: token }
+      }
+      this.loading = true
+      let response = await this.$axios.get(url, options)
+      this.loading = false
+      return response
+    },
+
+    saveData() {
+      if (this.validarPorcentajes()) {
+        console.log(this.currentData.levels);
+        let levels = Object.assign(
+        [],
+        this.currentData.levels.filter(x => x.categories.length > 0)
+      )
+      if (this.currentData.nombre != undefined && levels.length > 0) {
+        let url = 'rubricas/'
+        let token = this.$cookie.get(config.cookie.token)
+        var options = {
+          headers: { token: token }
+        }
+        this.loading = true
+        this.currentData.creador = this.$cookie.get(config.cookie.usuario)
+        
+        let data = {
+          json: Object.assign({}, this.currentData),
+          nombre: this.currentData.nombre,
+          creador: this.$cookie.get(config.cookie.usuario),
+          tipo :'PERSONALIZADA'
+        }
+        data.json.levels = levels
+        this.$axios
+          .post(url, data, options)
+          .then(async res => {
+            let data = res
+            if (data.status == 200) {
+              this.typeMessage = 'info'
+              this.messageInfo = 'Se guardo correctamente'
+              this.dialogInfo = true
+            }
+          })
+          .catch(err => {
+            console.log(err)
+          })
+          .finally(() => {
+            this.loading = false
+          })
+        this.loading = false
+      } else {
+        this.messageInfo = 'Error por favor revisa los campos'
+        this.dialogInfo = true
+        this.typeMessage = 'error'
+      }
+      } else {
+        this.messageInfo="Válida por favor que las categorias cargadas tengan un porcentaje, por el contrario eliminarlo, valida de el porcentaje sea igual a 100%"
+        this.dialogInfo=true
+      }
+    },
+    filter(item, queryText, itemText) {
+      if (item.header) return false
+      const hasValue = val => (val != null ? val : '')
+      const text = hasValue(itemText)
+      const query = hasValue(queryText)
+
+      return (
+        text
+          .toString()
+          .toLowerCase()
+          .indexOf(query.toString().toLowerCase()) > -1
+      )
     }
   }
 }
 </script>
 
 <style>
-.card-items {
-  /* background-color: rgb(255, 255, 255) !important; */
-  /* box-shadow: -1px -1px 0px gray, 1px -1px 0px gray, -1px 1px 0px gray,
-    1px 1px 0px gray; */
-  border-radius: 10px 10px 10px 10px;
-  -moz-border-radius: 10px 10px 10px 10px;
-  -webkit-border-radius: 10px 10px 10px 10px;
-  border: 2px solid #656565 !important;
+.tempo {
+  max-width: 300px;
 }
 </style>

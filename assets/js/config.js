@@ -3,17 +3,48 @@ let routes = require('./routes').default
 
 let config = {
     api:{
-        url:''
+        url:'http://localhost:8000/api/'
     },
     routes:routes,
     menuLateral:[
         {
             icon: 'dashboard',
             title: 'Plantillas Rúbrica',
-            to: routes.rubricBase
+            to: routes.rubricBase,
+            rol:'ADMINISTRADOR-JEFE'
+        },
+        {
+            icon: 'view_quilt',
+            title: 'Personalizar',
+            to: routes.personalization,
+            rol:'ADMINISTRADOR-PROFESOR-JEFE'
+        },
+        {
+            icon: 'supervisor_account',
+            title: 'Grupos',
+            to: routes.groups,
+            rol:'ADMINISTRADOR-JEFE'
+        },
+        {
+            icon: 'group_work',
+            title: 'Equipos',
+            to: routes.teams,
+            rol:'ADMINISTRADOR-PROFESOR-JEFE'
+        },
+        {
+            icon: 'person',
+            title: 'Usuarios',
+            to: routes.users,
+            rol:'ADMINISTRADOR'
         }
           
-    ]
+    ],
+    cookie:{
+        idPlantilla:'idPlantilla',
+        token :'token',
+        usuario:'usuario',
+        tipo:'tipo'
+    }
 }
 
 
