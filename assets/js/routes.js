@@ -8,7 +8,8 @@ let routes =
     users:'/users',
     personalization:'/personalization',
     personalizationNew:'/personalization/new',
-    grades:'/grades'
+    grades:'/grades',
+    activities:'/activities'
 
 
 }

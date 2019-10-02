@@ -7,6 +7,7 @@ let config = {
     },
     routes:routes,
     menuLateral:[
+        
         {
             icon: 'dashboard',
             title: 'Plantillas Rúbrica',
@@ -29,6 +30,12 @@ let config = {
             icon: 'group_work',
             title: 'Equipos',
             to: routes.teams,
+            rol:'ADMINISTRADOR-PROFESOR-JEFE'
+        },
+        {
+            icon: 'playlist_add',
+            title: 'Actividades',
+            to: routes.activities,
             rol:'ADMINISTRADOR-PROFESOR-JEFE'
         },
         {
