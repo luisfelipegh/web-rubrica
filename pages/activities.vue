@@ -27,9 +27,9 @@
               <v-col cols="12" sm="6" md="6">
                 <v-text-field
                   required
-                  v-model="currentData.profesor"
-                  label="Profesor"
-                  name="Profesor"
+                  v-model="currentData.creador"
+                  label="Creador"
+                  name="creador"
                   :rules="[rules.required, rules.email]"
                   type="text"
                 ></v-text-field>
@@ -146,12 +146,13 @@ export default {
       config: config,
       dialogDelete: false,
       headers: [
-        { text: 'Codigo', value: 'codigo' },
+        { text: 'Codigo', value: 'id' },
         { text: 'Nombre', value: 'nombre' },
-        { text: 'Profesor', value: 'profesor' },
+        { text: 'Profesor', value: 'creador' },
         { text: 'Acciones', value: 'action', sortable: false }
       ],
       items: [],
+      rubricas:[],
       currentData: {},
       loading: false,
       toDelete: undefined,
@@ -168,18 +169,20 @@ export default {
     }
   },
   beforeMount() {
-    this.currentData.profesor = this.$cookie.get(config.cookie.usuario)
+    this.currentData.creador = this.$cookie.get(config.cookie.usuario)
     this.loadData()
   },
   methods: {
     dialogCreateOpen() {
       this.currentData = {}
       this.editing = false
-      this.currentData.profesor = this.$cookie.get(config.cookie.usuario)
+      this.currentData.creador = this.$cookie.get(config.cookie.usuario)
       this.dialogCreate = true
     },
     editItem(item) {
       this.currentData = Object.assign({}, item)
+      let rubrica  = this.rubricas.find(x=> x.id= this.currentData.rubrica)
+      this.currentData.rubrica= rubrica
       this.dialogCreate = true
       this.editing = true
     },
@@ -192,7 +195,7 @@ export default {
       this.loading = true
       if (this.editing) {
         url += data.id
-        console.log(data)
+        data.rubrica = data.rubrica.id
         this.$axios
           .put(url, data, options)
           .then(async res => {
@@ -215,7 +218,7 @@ export default {
           })
         this.loading = false
       } else {
-        
+        data.rubrica = data.rubrica.id
         this.$axios
           .post(url, data, options)
           .then(async res => {
@@ -309,7 +312,14 @@ export default {
      * Obtener las plantillas personalizadas
      */
     async getRubricas() {
-      let url = 'rubricas/tipo/PERSONALIZADA'
+      let rol = this.$cookie.get(config.cookie.tipo)
+      let url =""
+      if(rol === "ADMINISTRADOR"){
+        url = 'rubricas/tipo/PERSONALIZADA'
+      }else{
+        url = 'rubricas/tipo/PERSONALIZADA/'+ this.$cookie.get(config.cookie.usuario)
+      }
+      
       let token = this.$cookie.get(config.cookie.token)
       var options = {
         headers: { token: token }
@@ -317,8 +327,10 @@ export default {
       this.loading = true
       let response = await this.$axios.get(url, options)
       this.loading = false
-      if (response.status == 200) {
+      if (response.status == 200 && Array.isArray(response.data)) {
         this.rubricas = response.data
+      }else{
+        this.rubricas=[]
       }
     },
   }
