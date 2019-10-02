@@ -1,5 +1,7 @@
 <template>
   <div>
+      <loading :dialog="loading"></loading>
+
      <!-- DIALOGO ELIMINAR -->
     <v-dialog v-model="dialogDeleteStudent" persistent max-width="290">
       <v-card>
@@ -111,12 +113,12 @@
         </div>
         <v-card-actions>
           <div class="flex-grow-1"></div>
-          <v-btn  class="text-capitalize" color="primary" rounded @click="create()">
+          <v-btn class="text-capitalize" outlined color="primary" rounded @click="cancelCreate()">
+            <v-icon right>cancel</v-icon>Cancelar
+          </v-btn>
+           <v-btn  class="text-capitalize" color="primary" rounded @click="create()">
             <v-icon right>save</v-icon>
             {{editing?'Guardar':'Crear'}}
-          </v-btn>
-          <v-btn class="text-capitalize" color="primary" rounded @click="cancelCreate()">
-            <v-icon right>cancel</v-icon>Cancelar
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -189,8 +191,9 @@
 
 <script>
 import config from '@/assets/js/config'
+import loading from '@/components/loading'
 export default {
-  components: {},
+  components:{loading},
   data() {
     return {
       nameRules: [v => !!v || 'Campo requerido'],

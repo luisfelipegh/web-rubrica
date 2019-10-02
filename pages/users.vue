@@ -1,5 +1,7 @@
 <template>
   <div>
+      <loading :dialog="loading"></loading>
+
     <v-dialog v-model="dialogInfo" persistent max-width="290">
       <v-card>
         <v-card-title class="headline">Mensaje</v-card-title>
@@ -20,9 +22,10 @@
               @change="onChange($event,'file')"
             />
         <v-card-actions>
-            <v-btn class="text-capitalize" color="primary" rounded @click.native="cancelArchivo">Cancelar</v-btn>
           <v-spacer></v-spacer>
-          <v-btn class="text-capitalize" color="primary" rounded @click.native="subirArchivo">OK</v-btn>
+            <v-btn class="text-capitalize" color="primary" outlined rounded @click.native="cancelArchivo"> <v-icon left >cancel</v-icon> Cancelar</v-btn>
+          
+          <v-btn class="text-capitalize" color="primary" rounded @click.native="subirArchivo"><v-icon left >save</v-icon> Ok</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -73,12 +76,13 @@
         </div>
         <v-card-actions>
           <div class="flex-grow-1"></div>
-          <v-btn class="text-capitalize" color="primary" rounded @click="create()">
+         
+          <v-btn class="text-capitalize" color="primary" outlined rounded @click="cancelCreate()">
+            <v-icon right>cancel</v-icon>Cancelar
+          </v-btn>
+           <v-btn class="text-capitalize" color="primary" rounded @click="create()">
             <v-icon right>save</v-icon>
             {{editing?'Guardar':'Crear'}}
-          </v-btn>
-          <v-btn class="text-capitalize" color="primary" rounded @click="cancelCreate()">
-            <v-icon right>cancel</v-icon>Cancelar
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -102,7 +106,7 @@
           <v-card-title>
             Creación de Usuarios
             <v-spacer></v-spacer>
-            <v-btn class="text-capitalize" color="primary" rounded @click.native="agregarUsuarios()">Importación de usuarios</v-btn>
+            <v-btn class="text-capitalize mx-2" color="primary" outlined rounded @click.native="agregarUsuarios()">Importar usuarios</v-btn>
             <v-btn class="text-capitalize" color="primary" rounded @click.stop="dialogCreateOpen()">Crear Usuario</v-btn>
           </v-card-title>
           <v-card-text>
@@ -123,9 +127,9 @@
 
 <script>
 import config from '@/assets/js/config'
+import loading from '@/components/loading'
 export default {
-  components:{
-  },
+  components:{loading},
   data() {
     return {
       nameRules: [v => !!v || 'Campo requerido'],

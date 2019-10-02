@@ -1,47 +1,30 @@
 <template>
   <div>
+    <loading :dialog="loading"></loading>
+
     <v-dialog v-model="dialogInfo" persistent max-width="290">
       <v-card>
         <v-card-title class="headline">Mensaje</v-card-title>
         <v-card-text>{{ messageInfo }}</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" class="text-capitalize" rounded @click.native="dialogInfo = false">OK</v-btn>
+          <v-btn
+            color="primary"
+            class="text-capitalize"
+            rounded
+            @click.native="dialogInfo = false"
+          >OK</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
     <v-dialog persistent v-model="previewR" v-if="toPreview != undefined">
       <v-card>
-        <v-card-title class="headline">Previsualización de la rúbrica</v-card-title>
-        <<v-simple-table  class="define">
-          <thead>
-            <tr>
-              <th class="text-left test">Nivel</th>
-              <th class="text-left test">Categoria</th>
-            </tr>
-          </thead>
-          <tbody >
-            <tr v-for="(item) in toPreview.json.levels" :key="item.name">
-              <td class="level" v-if="item.categories.length != 0"><b>{{ item.name }}</b></td>
-              <td>
-                <table class="defineCategories">
-                  <tbody>
-                    <tr  v-for="(item2) in item.categories" :key="item2.name">
-                      <td class="labelCat"> <b>{{ item2.category }}</b></td>
-                          <div class="defineSkills" v-for="(item3) in item2.skills" :key="item3.index">
-                            <span >{{ item3.text }}</span>
-                          </div>
-                    </tr>
-                  </tbody>
-                </table>
-              </td>
-            </tr>
-          </tbody>
-        </v-simple-table>
-        <v-card-actions>
+        <v-card-title class="headline">Previsualización de la rúbrica
+          <v-spacer/>
+          <v-card-actions>
           <div class="flex-grow-1"></div>
           <v-btn
-          class="text-capitalize"
+            class="text-capitalize"
             color="primary"
             rounded
             @click="
@@ -50,6 +33,44 @@
             "
           >Ok</v-btn>
         </v-card-actions>
+        </v-card-title>
+          
+        <v-simple-table class="define">
+          <thead>
+            <tr>
+              <th class="text-left test">Nivel</th>
+              <th class="text-left test">Categoria</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item) in toPreview.json.levels" :key="item.name">
+              <td class="level" v-if="item.categories.length != 0">
+                <b>{{ item.name }}</b>
+              </td>
+              <td>
+               <v-simple-table dense  class="defineCategories">
+                  <tbody>
+                    <tr v-for="(item2) in item.categories" :key="item2.name">
+                      <td class="labelCatPerso">
+                        <b>{{ item2.category }}</b>
+                      </td>
+                      <td class="defineCate">
+                      <v-simple-table dense>
+                        <tbody>
+                        <tr class="defineSkills" v-for="(item3) in item2.skills" :key="item3.index">
+                          <td class="labelSkillsPerso">{{ item3.text }}</td>
+                        </tr>
+                        </tbody>
+                      </v-simple-table >
+                      </td>
+                    </tr>
+                  </tbody>
+                </v-simple-table>
+              </td>
+            </tr>
+          </tbody>
+        </v-simple-table>
+      
       </v-card>
     </v-dialog>
     <!-- DIALOGO ELIMINAR -->
@@ -59,7 +80,7 @@
         <v-card-text>Al eliminar no se podrá recuperar posteriormente.</v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn  class="text-capitalize" @click.native="dialogDelete = false" rounded>No</v-btn>
+          <v-btn class="text-capitalize" @click.native="dialogDelete = false" rounded>No</v-btn>
           <v-btn class="text-capitalize" color="primary" rounded @click.native="confirmDelete()">Sí</v-btn>
         </v-card-actions>
       </v-card>
@@ -72,7 +93,7 @@
             Plantillas de Rúbricas
             <v-spacer></v-spacer>
             <v-btn
-            class="text-capitalize"
+              class="text-capitalize"
               color="primary"
               rounded
               @click.stop="$router.push(config.routes.rubricBaseNew)"
@@ -96,8 +117,9 @@
 
 <script>
 import config from '@/assets/js/config'
-
+import loading from '@/components/loading'
 export default {
+  components: { loading },
   data() {
     return {
       dialogView: false,
@@ -140,7 +162,7 @@ export default {
       this.$axios
         .delete(url, options)
         .then(async res => {
-            let data = res
+          let data = res
           if (data.status == 200) {
             this.dialogDelete = false
             this.dialogInfo = true
@@ -179,10 +201,10 @@ export default {
 }
 </script>
 <style>
-.level{
-width: 150px;
+.level {
+  width: 150px;
 }
-.labelCat{
-width: 200px;
+.labelCat {
+  width: 200px;
 }
 </style>

@@ -7,7 +7,9 @@ let routes =
     teams:'/teams',
     users:'/users',
     personalization:'/personalization',
-    personalizationNew:'/personalization/new'
+    personalizationNew:'/personalization/new',
+    grades:'/grades'
+
 
 }
 
