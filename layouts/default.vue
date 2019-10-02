@@ -12,16 +12,16 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-
-    <v-app-bar :clipped-left="clipped" fixed app>
+    <v-app-bar :clipped-left="clipped" fixed app >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
+      <v-btn icon @click.stop="miniVariant = !miniVariant">
+          <v-icon>keyboard_arrow_right</v-icon>
+        </v-btn>
       <strong>Rúbrica de Evaluación</strong>
       <v-spacer></v-spacer>
       <a href="/home" class="pt-1"></a>
-
       <img src="@/static/img/company_logo.png" width="130" href="/home/" />
       <v-spacer></v-spacer>
-
       <v-menu>
         <template v-slot:activator="{ on }">
           <v-btn class="text-capitalize" color="primary" dark v-on="on">{{user.nombre}}</v-btn>
@@ -58,11 +58,11 @@ export default {
       user: '',
       config: config,
       clipped: true,
-      drawer: false,
-      fixed: false,
+      drawer: true,
+      fixed: true,
       items:[],
       principales: config.menuLateral,
-      miniVariant: false,
+      miniVariant: true,
       right: true,
       rightDrawer: false
     }

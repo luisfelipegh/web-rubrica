@@ -1,7 +1,7 @@
 <template>
   <div>
     <loading :dialog="loading"></loading>
-
+    <!-- Dialogo de informcacio (NMensajes al usuario) -->
     <v-dialog v-model="dialogInfo" persistent max-width="290">
       <v-card>
         <v-card-title class="headline">Mensaje</v-card-title>
@@ -17,55 +17,45 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog persistent v-model="dialogCreate" max-width="800">
+    <!-- Dialogo Crear -->
+    <v-dialog persistent v-model="dialogCreate" max-width="600">
       <v-card>
-        <v-card-title
-          class="headline"
-        >Calificar </v-card-title>
-        <div v-if="currentData!=undefined">
+        <v-card-title class="headline">{{editing?'Editar Actividad':'Crear Actividad'}}</v-card-title>
+        <div>
           <v-form v-model="valid" ref="formData" lazy-validation>
             <v-row class="px-5">
               <v-col cols="12" sm="6" md="6">
                 <v-text-field
                   required
-                  v-model="currentData.grupo.nombre"
-                  label="Grupo"
-                  name="Grupo"
-                  disabled
+                  v-model="currentData.profesor"
+                  label="Profesor"
+                  name="Profesor"
+                  :rules="[rules.required, rules.email]"
                   type="text"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="6">
                 <v-text-field
-                required
-                :rules="nameRules"
-                  v-model="currentData.actividad"
-                  label="Actividad a calificar"
-                  name="actividad"
+                  required
+                  :rules="nameRules"
+                  v-model="currentData.nombre"
+                  label="Nombre"
                   type="text"
                 ></v-text-field>
               </v-col>
-              <v-col cols="12" sm="6" md="6">
-                Calificar:
-                <v-radio-group @change="changeType" v-model="currentData.type" row>
-                  <v-radio label="Estudiante" value="estudiante"></v-radio>
-                  <v-radio label="Equipo" value="equipo"></v-radio>
-                </v-radio-group>
-              </v-col>
-             
                <v-col cols="12" sm="6" md="6">
                 <v-autocomplete
-                :loading="loading"
-                  label="Selecciona el calificado"
-                  v-model="currentData.calificado"
-                  :items="aseleccionaracalificar"
+                 :loading="loading"
+                  label="Selecciona la rúbrica"
+                  v-model="currentData.rubrica"
+                  :items="rubricas"
                   no-data-text="Escribe para buscar"
                   clearable
                   required
                   :rules="nameRules"
                   hide-selected
                   return-object
-                  item-text="nombre"
+                  item-text="label"
                 >
                   <template v-slot:no-data>
                     <span>No se encontraron plantillas</span>
@@ -104,49 +94,37 @@
       <v-flex xs12>
         <v-card>
           <v-card-title>
-            Calificaciones {{selectedGroup ? 'de ' + selectedGroup.nombre:''}}
+            Creación de actividades
             <v-spacer></v-spacer>
             <v-btn
               class="text-capitalize"
-              v-if="selectedGroup!=undefined"
               color="primary"
               rounded
               @click.stop="dialogCreateOpen()"
-            >Realizar Calificación</v-btn>
+            >Crear Actividad</v-btn>
           </v-card-title>
           <v-card-text>
-            <v-autocomplete
-              label="Selecciona un grupo"
-              v-model="selectedGroup"
-              :items="grupos"
-               :loading="loading"
-              return-object
-              item-text="nombre"
-              @change="findGrades"
-            ></v-autocomplete>
-            <div v-if="selectedGroup!=undefined">
-              <v-data-table :loading="loading" :headers="headers" :items="items">
-                <template v-slot:item.action="{ item }">
-                  <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                      <v-btn icon v-on="on">
-                        <v-icon small class="pr-2">remove_red_eye</v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Ver Calificación</span>
-                  </v-tooltip>
-                  <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                      <v-btn icon v-on="on">
-                        <v-icon small @click="deleteItem(item)">delete</v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Eliminar Calificación</span>
-                  </v-tooltip>
-                </template>
-                <template slot="no-data">No se encontraron calificaciones</template>
-              </v-data-table>
-            </div>
+            <v-data-table :headers="headers" :items="items">
+              <template v-slot:item.action="{ item }">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <v-btn icon v-on="on">
+                      <v-icon small class="pr-2" @click="editItem(item)">edit</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Editar Actividad</span>
+                </v-tooltip>
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on }">
+                    <v-btn icon v-on="on">
+                      <v-icon small class="pr-2" @click="deleteItem(item)">delete</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Eliminar Actividad</span>
+                </v-tooltip>
+              </template>
+              <template slot="no-data">No se encontraron actividades</template>
+            </v-data-table>
           </v-card-text>
         </v-card>
       </v-flex>
@@ -163,9 +141,6 @@ export default {
     return {
       nameRules: [v => !!v || 'Campo requerido'],
       valid: true,
-      path: 'equipos/',
-      grupos: [],
-      aseleccionaracalificar:[],
       messageInfo: '',
       dialogInfo: false,
       config: config,
@@ -173,17 +148,23 @@ export default {
       headers: [
         { text: 'Codigo', value: 'codigo' },
         { text: 'Nombre', value: 'nombre' },
+        { text: 'Profesor', value: 'profesor' },
         { text: 'Acciones', value: 'action', sortable: false }
       ],
       items: [],
-      selectedGroup: undefined,
-      selectedTeam: undefined,
-      currentData: { grupo: {} },
+      currentData: {},
       loading: false,
       toDelete: undefined,
+      toPreview: undefined,
       dialogCreate: false,
+      dialogPost: false,
       editing: true,
-      toUpload: {}
+      rules: {
+        email: value => {
+          const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+          return pattern.test(value) || 'Correo Inválido'
+        }
+      }
     }
   },
   beforeMount() {
@@ -191,27 +172,10 @@ export default {
     this.loadData()
   },
   methods: {
-    changeType(data) {
-      if (data == 'estudiante') {
-        this.currentData.calificado={}
-        this.findStudents()
-      }
-      if (data == 'equipo') {
-        this.currentData.calificado={}
-        this.findTeams()
-      }
-    },
-    async findGrades() {
-      this.items = []
-      let data = await this.getAllData(this.selectedGroup)
-      if (data.status && Array.isArray(data.data)) {
-        this.items = data.data
-      }
-    },
-    async dialogCreateOpen() {
-      this.currentData.grupo = Object.assign({}, this.selectedGroup)
-      this.currentData.nombre = ''
+    dialogCreateOpen() {
+      this.currentData = {}
       this.editing = false
+      this.currentData.profesor = this.$cookie.get(config.cookie.usuario)
       this.dialogCreate = true
     },
     editItem(item) {
@@ -220,14 +184,15 @@ export default {
       this.editing = true
     },
     saveData(data) {
-      let url = 'equipos/'
+      let url = 'actividades/'
       let token = this.$cookie.get(config.cookie.token)
       var options = {
         headers: { token: token }
       }
       this.loading = true
       if (this.editing) {
-        url += data.grupo + '/' + data.codigo
+        url += data.id
+        console.log(data)
         this.$axios
           .put(url, data, options)
           .then(async res => {
@@ -236,9 +201,9 @@ export default {
               this.dialogCreate = false
               this.typeMessage = 'info'
               this.messageInfo = 'Se guardo correctamente'
-              this.currentData = { grupo: {} }
+              this.currentData = {}
               this.dialogInfo = true
-              this.findTeams()
+              this.loadData()
             }
           })
           .catch(err => {
@@ -250,22 +215,19 @@ export default {
           })
         this.loading = false
       } else {
-        let dataNew = {
-          grupo: data.grupo.codigo,
-          nombre: data.nombre
-        }
+        
         this.$axios
-          .post(url, dataNew, options)
+          .post(url, data, options)
           .then(async res => {
             let data = res
             if (data.status == 200) {
               this.dialogCreate = false
               this.typeMessage = 'info'
               this.messageInfo = 'Se guardo correctamente'
-              this.currentData = { grupo: {} }
+              this.currentData = {}
               this.dialogInfo = true
               this.editing = false
-              this.findTeams()
+              this.loadData()
             }
           })
           .catch(err => {
@@ -295,7 +257,7 @@ export default {
       this.toDelete = item
     },
     confirmDelete() {
-      let url = `${this.path}${this.toDelete.grupo}/${this.toDelete.codigo}`
+      let url = 'actividades/' + this.toDelete.id
       let token = this.$cookie.get(config.cookie.token)
       var options = {
         headers: { token: token }
@@ -309,36 +271,31 @@ export default {
             this.dialogDelete = false
             this.dialogInfo = true
             this.messageInfo = 'Eliminado Correctamente'
-            this.findTeams()
+            this.loadData()
           }
         })
         .catch(err => {
           this.dialogDelete = false
           this.dialogInfo = true
-          this.messageInfo = 'Verifica que no hayan estudiantes en el equipo'
+          this.messageInfo =
+            'Verifica que el la actividad no se haya calificado'
         })
         .finally(() => {
           this.loading = false
         })
       this.loading = false
     },
-    /**
-     * Cargar info necesaria
-     */
     async loadData() {
-      let data1 = await this.getAllDataGrupos()
-      if (data1.status == 200) {
-        for (let index = 0; index < data1.data.length; index++) {
-          const element = data1.data[index]
-        }
-        this.grupos = data1.data
+      this.getRubricas()
+      let data = await this.getAllData()
+      if (data.status == 200 && Array.isArray(data.data)){
+        this.items = data.data
+      }else {
+          this.items = []
       }
     },
-    /**
-     * Obtener calificaciones del grupo
-     */
-    async getAllData(team) {
-      let url = `${this.path}xgrupo/${team.codigo}`
+    async getAllData() {
+      let url = 'actividades/'
       let token = this.$cookie.get(config.cookie.token)
       var options = {
         headers: { token: token }
@@ -349,13 +306,10 @@ export default {
       return response
     },
     /**
-     * Combo box de seleccionar grupos
+     * Obtener las plantillas personalizadas
      */
-    async getAllDataGrupos() {
-      let url = 'grupos/'
-      if (this.$cookie.get(config.cookie.tipo) == 'PROFESOR') {
-        url += 'profesor/' + this.$cookie.get(config.cookie.usuario)
-      }
+    async getRubricas() {
+      let url = 'rubricas/tipo/PERSONALIZADA'
       let token = this.$cookie.get(config.cookie.token)
       var options = {
         headers: { token: token }
@@ -363,32 +317,8 @@ export default {
       this.loading = true
       let response = await this.$axios.get(url, options)
       this.loading = false
-      return response
-    },
-     async findStudents() {
-      let url = `grupos/estudiantes/${this.selectedGroup.codigo}/${this.selectedGroup.semestre}`
-      let token = this.$cookie.get(config.cookie.token)
-      var options = {
-        headers: { token: token }
-      }
-      this.loading = true
-      let response = await this.$axios.get(url, options)
-      this.loading = false
-      if (response.status == 200 && Array.isArray(response.data)) {
-        this.aseleccionaracalificar = response.data
-      }
-    },
-     async findTeams() {
-      let url = `${this.path}xgrupo/${this.selectedGroup.codigo}`
-      let token = this.$cookie.get(config.cookie.token)
-      var options = {
-        headers: { token: token }
-      }
-      this.loading = true
-      let data = await this.$axios.get(url, options)
-      this.loading = false
-      if (data.status && Array.isArray(data.data)) {
-        this.aseleccionaracalificar = data.data
+      if (response.status == 200) {
+        this.rubricas = response.data
       }
     },
   }
