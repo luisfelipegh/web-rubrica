@@ -32,6 +32,12 @@ let config = {
             rol:'ADMINISTRADOR-PROFESOR-JEFE'
         },
         {
+            icon: 'playlist_add_check',
+            title: 'Calificaciones',
+            to: routes.grades,
+            rol:'ADMINISTRADOR-PROFESOR-JEFE'
+        },
+        {
             icon: 'person',
             title: 'Usuarios',
             to: routes.users,
@@ -43,7 +49,8 @@ let config = {
         idPlantilla:'idPlantilla',
         token :'token',
         usuario:'usuario',
-        tipo:'tipo'
+        tipo:'tipo',
+        editRubric :'editRubric'
     }
 }
 

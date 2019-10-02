@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-btn class="text-capitalize" rounded color="primary" @click.stop="prepare()">Ver</v-btn>
+    <v-btn class="text-capitalize" rounded outlined color="primary" @click.stop="prepare()">Vista Previa</v-btn>
 
     <v-dialog persistent v-model="dialog">
       <v-card>

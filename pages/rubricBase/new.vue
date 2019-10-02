@@ -116,7 +116,7 @@
                         <v-col cols="12" sm="6" md="2">
                           <v-btn
                             class="text-capitalize"
-                            color="primary"
+                           outlined
                             rounded
                             @click="aggregateItem(n)"
                           >Agregar</v-btn>
@@ -160,24 +160,28 @@
                     </v-row>
                   </v-container>
                 </v-card>
+                <hr>
                 <v-card-actions>
                   <v-row>
-                    <v-col cols="12" sm="12" md="2">
+                     <v-col cols="12" sm="12" md="3">
                       <v-btn
-                        class="text-capitalize"
-                        color="primary"
-                        rounded
-                        @click="nextStep(n.id)"
-                      >Agregar Nivel</v-btn>
-                    </v-col>
-                    <v-col cols="12" sm="12" md="3">
-                      <v-btn
+                      text
                         class="text-capitalize"
                         color="primary"
                         rounded
                         @click="ClearCategory(n)"
                       >Limpiar Nivel</v-btn>
                     </v-col>
+                    <v-col cols="12" sm="12" md="2">
+                      <v-btn
+                        text
+                        class="text-capitalize"
+                        color="primary"
+                        rounded
+                        @click="nextStep(n.id)"
+                      >Siguiente <v-icon left >navigate_next</v-icon></v-btn>
+                    </v-col>
+                   
                   </v-row>
                 </v-card-actions>
               </v-stepper-content>
@@ -282,7 +286,7 @@
                         <v-col cols="12" sm="6" md="2">
                           <v-btn
                             class="text-capitalize"
-                            color="primary"
+                            outlined
                             rounded
                             @click="aggregateItem(n)"
                           >Agregar</v-btn>
@@ -327,23 +331,28 @@
                   </v-container>
                 </v-card>
                 <v-card-actions>
-                  <v-row>
-                    <v-col cols="12" sm="12" md="2">
+                    <v-row>
+                     <v-col cols="12" sm="12" md="3">
                       <v-btn
-                        class="text-capitalize"
-                        color="primary"
-                        rounded
-                        @click="nextStep(n.id)"
-                      >Agregar Nivel</v-btn>
-                    </v-col>
-                    <v-col cols="12" sm="12" md="3">
-                      <v-btn
+                      text
                         class="text-capitalize"
                         color="primary"
                         rounded
                         @click="ClearCategory(n)"
                       >Limpiar Nivel</v-btn>
                     </v-col>
+                    <v-col cols="12" sm="12" md="8">
+                    </v-col>
+                    <v-col cols="12" sm="12" md="1">
+                      <v-btn
+                        text
+                        class="text-capitalize"
+                        color="primary"
+                        rounded
+                        @click="nextStep(n.id)"
+                      >Siguiente <v-icon left >navigate_next</v-icon></v-btn>
+                    </v-col>
+                   
                   </v-row>
                 </v-card-actions>
               </v-stepper-content>
@@ -351,9 +360,17 @@
           </template>
         </v-stepper>
         <v-card-actions>
+          <v-btn
+            outlined
+            class="ml-3 text-capitalize"
+             color="primary"
+            rounded
+            @click="$router.push(routeIndexRubric)"
+          >Cancelar Rúbrica</v-btn>
           <v-spacer></v-spacer>
           <preview-base :base="currentData" />
           <v-btn
+            :disabled="e1<=currentData.levels.length"
             class="ml-3 text-capitalize"
             color="primary"
             rounded
@@ -368,9 +385,11 @@
 <script>
 import config from '@/assets/js/config'
 import previewBase from '@/components/previewBase'
+import loading from '@/components/loading'
+
 export default {
   components: {
-    previewBase
+    previewBase,loading
   },
   data() {
     return {
@@ -401,7 +420,7 @@ export default {
       skills: [],
       category: '',
       editable: true,
-      vertical: true,
+      vertical: false,
       currentData: {
         nombre: '',
         levels: [

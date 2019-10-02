@@ -1,16 +1,17 @@
 <template>
-  <div class="text-xs-center">
-    <v-dialog v-model="dialog" persistent width="400">
-      <v-card  dark>
+<div></div>
+    <!-- <v-dialog v-model="dialog" persistent width="400">
+      <v-card>
         <v-card-text>
-            <center><b>
-                Cargando...</b>
-                </center>
-          <v-progress-linear indeterminate color="primary" class="mb-0"></v-progress-linear>
+          <div>
+            <center>
+              <b>Cargando...</b>
+              <v-progress-linear indeterminate color="primary" class="mb-0"></v-progress-linear>
+            </center>
+          </div>
         </v-card-text>
       </v-card>
-    </v-dialog>
-  </div>
+    </v-dialog> -->
 </template>
 
 <script>
