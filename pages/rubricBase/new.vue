@@ -163,25 +163,33 @@
                 <hr>
                 <v-card-actions>
                   <v-row>
-                     <v-col cols="12" sm="12" md="3">
+                     <v-col  cols="12" sm="3" md="2">
                       <v-btn
                       text
                         class="text-capitalize"
                         color="primary"
                         rounded
-                        @click="ClearCategory(n)"
-                      >Limpiar Nivel</v-btn>
+                        @click="returnStep(n.id)"
+                      >  <v-icon rigth >navigate_before</v-icon> Atras</v-btn>
                     </v-col>
-                    <v-col cols="12" sm="12" md="2">
+                       <v-col cols="12" sm="3" md="3">
                       <v-btn
                         text
+                        class="text-capitalize"
+                        color="primary"
+                        rounded
+                        @click="ClearCategory(n)"
+                      >  Limpiar Nivel  </v-btn>
+                    </v-col>
+                    <v-col  cols="12" sm="3" md="2">
+                      <v-btn
+                      text
                         class="text-capitalize"
                         color="primary"
                         rounded
                         @click="nextStep(n.id)"
                       >Siguiente <v-icon left >navigate_next</v-icon></v-btn>
                     </v-col>
-                   
                   </v-row>
                 </v-card-actions>
               </v-stepper-content>
@@ -332,27 +340,33 @@
                 </v-card>
                 <v-card-actions>
                     <v-row>
-                     <v-col cols="12" sm="12" md="3">
+                    <v-col  cols="12" sm="3" md="2">
                       <v-btn
                       text
                         class="text-capitalize"
                         color="primary"
                         rounded
-                        @click="ClearCategory(n)"
-                      >Limpiar Nivel</v-btn>
+                        @click="returnStep(n.id)"
+                      >  <v-icon rigth >navigate_before</v-icon> Atras</v-btn>
                     </v-col>
-                    <v-col cols="12" sm="12" md="8">
-                    </v-col>
-                    <v-col cols="12" sm="12" md="1">
+                       <v-col cols="12" sm="3" md="3">
                       <v-btn
                         text
+                        class="text-capitalize"
+                        color="primary"
+                        rounded
+                        @click="ClearCategory(n)"
+                      >  Limpiar Nivel  </v-btn>
+                    </v-col>
+                    <v-col  cols="12" sm="3" md="2">
+                      <v-btn
+                      text
                         class="text-capitalize"
                         color="primary"
                         rounded
                         @click="nextStep(n.id)"
                       >Siguiente <v-icon left >navigate_next</v-icon></v-btn>
                     </v-col>
-                   
                   </v-row>
                 </v-card-actions>
               </v-stepper-content>
@@ -593,6 +607,15 @@ export default {
     },
     onInput(val) {
       this.currentData.levels = parseInt(val)
+    },
+
+
+    returnStep(n) {
+      if (n === this.currentData.levels) {
+        this.e1 = 1
+      } else {
+        this.e1 = n - 1
+      }
     },
     nextStep(n) {
       if (n === this.levels) {

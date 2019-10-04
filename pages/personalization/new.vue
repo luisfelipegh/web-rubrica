@@ -147,7 +147,7 @@
                         <v-col cols="12" sm="6" md="2">
                           <v-btn
                             class="text-capitalize"
-                            color="primary"
+                           outlined
                             rounded
                             @click="aggregateItem(n)"
                           >Agregar</v-btn>
@@ -187,10 +187,9 @@
                                 </v-simple-table>
                               </td>
                               <td class="text-center">
-                                <v-icon class="mr-2" color="primary" @click="editItem(n, item)">edit</v-icon>
+                                <v-icon class="mr-2" @click="editItem(n, item)">edit</v-icon>
                                 <v-icon
                                   class="mr-2"
-                                  color="primary"
                                   @click="deleteItem(n, item)"
                                 >delete</v-icon>
                               </td>
@@ -209,21 +208,32 @@
                 <hr />
                 <v-card-actions>
                   <v-row>
-                    <v-col cols="12" sm="12" md="3">
+                    <v-col  cols="12" sm="3" md="2">
                       <v-btn
+                      text
+                        class="text-capitalize"
+                        color="primary"
+                        rounded
+                        @click="returnStep(n.id)"
+                      >  <v-icon rigth >navigate_before</v-icon> Atras</v-btn>
+                    </v-col>
+                       <v-col cols="12" sm="3" md="3">
+                      <v-btn
+                        text
                         class="text-capitalize"
                         color="primary"
                         rounded
                         @click="ClearCategory(n)"
-                      >Limpiar Nivel</v-btn>
+                      >  Limpiar Nivel  </v-btn>
                     </v-col>
-                    <v-col cols="12" sm="12" md="2">
+                    <v-col  cols="12" sm="3" md="2">
                       <v-btn
+                      text
                         class="text-capitalize"
                         color="primary"
                         rounded
                         @click="nextStep(n.id)"
-                      >Agregar Nivel</v-btn>
+                      >Siguiente <v-icon left >navigate_next</v-icon></v-btn>
                     </v-col>
                   </v-row>
                 </v-card-actions>
@@ -388,7 +398,16 @@
                 <hr />
                 <v-card-actions>
                   <v-row>
-                    <v-col cols="12" sm="3" md="3">
+                    <v-col  cols="12" sm="3" md="2">
+                      <v-btn
+                      text
+                        class="text-capitalize"
+                        color="primary"
+                        rounded
+                        @click="returnStep(n.id)"
+                      >  <v-icon rigth >navigate_before</v-icon> Atras</v-btn>
+                    </v-col>
+                       <v-col cols="12" sm="3" md="3">
                       <v-btn
                         text
                         class="text-capitalize"
@@ -397,7 +416,6 @@
                         @click="ClearCategory(n)"
                       >  Limpiar Nivel  </v-btn>
                     </v-col>
-                     <v-col cols="12" sm="6" md="6"></v-col>
                     <v-col  cols="12" sm="3" md="2">
                       <v-btn
                       text
@@ -659,6 +677,14 @@ export default {
         this.e1 = 1
       } else {
         this.e1 = n + 1
+      }
+    },
+
+    returnStep(n) {
+      if (n === this.currentData.levels) {
+        this.e1 = 1
+      } else {
+        this.e1 = n - 1
       }
     },
     async loadData() {

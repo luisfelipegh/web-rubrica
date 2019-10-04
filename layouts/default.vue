@@ -59,10 +59,10 @@ export default {
       config: config,
       clipped: true,
       drawer: true,
-      fixed: true,
+      fixed: false,
       items:[],
       principales: config.menuLateral,
-      miniVariant: true,
+      miniVariant: false,
       right: true,
       rightDrawer: false
     }

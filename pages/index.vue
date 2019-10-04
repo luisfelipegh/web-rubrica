@@ -46,7 +46,6 @@
                 </v-form>
               </v-card-text>
               <v-progress-linear :v-if="loading" indeterminate color="white" class="mb-0"></v-progress-linear>
-
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn class="text-capitalize" color="primary" rounded @click="login()">Ingresar</v-btn>
