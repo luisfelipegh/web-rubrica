@@ -608,8 +608,6 @@ export default {
     onInput(val) {
       this.currentData.levels = parseInt(val)
     },
-
-
     returnStep(n) {
       if (n === this.currentData.levels) {
         this.e1 = 1

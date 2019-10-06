@@ -9,7 +9,9 @@ let routes =
     personalization:'/personalization',
     personalizationNew:'/personalization/new',
     grades:'/grades',
-    activities:'/activities'
+    activities:'/activities',
+    mygrades:'/mygrades'
+
 
 
 }

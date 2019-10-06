@@ -24,7 +24,8 @@
       <v-spacer></v-spacer>
       <v-menu>
         <template v-slot:activator="{ on }">
-          <v-btn class="text-capitalize" color="primary" dark v-on="on">{{user.nombre}}</v-btn>
+          <v-btn text class="text-capitalize" color="primary" dark v-on="on">
+            {{user.nombre}} <v-icon>expand_more</v-icon></v-btn>
         </template>
         <v-list>
           <v-list-item @click="Perfil()">

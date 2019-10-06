@@ -19,9 +19,7 @@
     </v-dialog>
     <v-dialog persistent v-model="dialogCreate" max-width="800">
       <v-card>
-        <v-card-title
-          class="headline"
-        >Calificar </v-card-title>
+        <v-card-title class="headline">Calificar</v-card-title>
         <div v-if="currentData!=undefined">
           <v-form v-model="valid" ref="formData" lazy-validation>
             <v-row class="px-5">
@@ -36,14 +34,23 @@
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="6">
-                <v-text-field
-                required
-                :rules="nameRules"
+                <v-autocomplete
+                  :loading="loading"
+                  label="Selecciona la actividad"
                   v-model="currentData.actividad"
-                  label="Actividad a calificar"
-                  name="actividad"
-                  type="text"
-                ></v-text-field>
+                  :items="aseleccionaractividades"
+                  no-data-text="Escribe para buscar"
+                  clearable
+                  required
+                  :rules="nameRules"
+                  hide-selected
+                  return-object
+                  item-text="nombre"
+                >
+                  <template v-slot:no-data>
+                    <span>No se encontraron actividades</span>
+                  </template>
+                </v-autocomplete>
               </v-col>
               <v-col cols="12" sm="6" md="6">
                 Calificar:
@@ -52,10 +59,10 @@
                   <v-radio label="Equipo" value="equipo"></v-radio>
                 </v-radio-group>
               </v-col>
-             
-               <v-col cols="12" sm="6" md="6">
+
+              <v-col cols="12" sm="6" md="6">
                 <v-autocomplete
-                :loading="loading"
+                  :loading="loading"
                   label="Selecciona el calificado"
                   v-model="currentData.calificado"
                   :items="aseleccionaracalificar"
@@ -68,10 +75,28 @@
                   item-text="nombre"
                 >
                   <template v-slot:no-data>
-                    <span>No se encontraron plantillas</span>
+                    <span>No se encontraron {{currentData.type=='estudiante'? 'estudiantes':currentData.type=='equipo'? 'equipos':'items'}}</span>
                   </template>
                 </v-autocomplete>
               </v-col>
+              <v-col cols="12" sm="6" md="6" v-if="currentData.calificacion">
+                <v-text-field
+                  label="Calificacion"
+                  name="calificacion"
+                  disabled
+                  v-model="currentData.calificacion.totalNota"
+                  type="number"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-row class="px-5">
+              <v-spacer></v-spacer>
+              <grade
+                @save-dialog="recibirCalificacion"
+                v-if="currentData.calificado!=undefined&&currentData.actividad!=undefined"
+                :base="currentData"
+              ></grade>
+              <v-spacer></v-spacer>
             </v-row>
           </v-form>
         </div>
@@ -80,7 +105,7 @@
           <v-btn class="text-capitalize" outlined color="primary" rounded @click="cancelCreate()">
             <v-icon right>cancel</v-icon>Cancelar
           </v-btn>
-          <v-btn class="text-capitalize" color="primary" rounded @click="create()">
+          <v-btn :disabled="currentData.calificacion==undefined" class="text-capitalize" color="primary" rounded @click="create()">
             <v-icon right>save</v-icon>
             {{editing?'Guardar':'Crear'}}
           </v-btn>
@@ -119,7 +144,7 @@
               label="Selecciona un grupo"
               v-model="selectedGroup"
               :items="grupos"
-               :loading="loading"
+              :loading="loading"
               return-object
               item-text="nombre"
               @change="findGrades"
@@ -127,14 +152,7 @@
             <div v-if="selectedGroup!=undefined">
               <v-data-table :loading="loading" :headers="headers" :items="items">
                 <template v-slot:item.action="{ item }">
-                  <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                      <v-btn icon v-on="on">
-                        <v-icon small class="pr-2">remove_red_eye</v-icon>
-                      </v-btn>
-                    </template>
-                    <span>Ver Calificación</span>
-                  </v-tooltip>
+                        <gradeView :base="item"/>
                   <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
                       <v-btn icon v-on="on">
@@ -157,25 +175,29 @@
 <script>
 import config from '@/assets/js/config'
 import loading from '@/components/loading'
+import grade from '@/components/gradeBasePersonalized'
+import gradeView from '@/components/grade'
+
 export default {
-  components: { loading },
+  components: { loading, grade ,gradeView},
   data() {
     return {
       nameRules: [v => !!v || 'Campo requerido'],
       valid: true,
-      path: 'equipos/',
+      path: 'calificaciones/',
       grupos: [],
-      aseleccionaracalificar:[],
+      aseleccionaracalificar: [],
       messageInfo: '',
       dialogInfo: false,
       config: config,
       dialogDelete: false,
       headers: [
-        { text: 'Codigo', value: 'codigo' },
+        { text: 'Tipo', value: 'tipo' },
         { text: 'Nombre', value: 'nombre' },
         { text: 'Acciones', value: 'action', sortable: false }
       ],
       items: [],
+      aseleccionaractividades: [],
       selectedGroup: undefined,
       selectedTeam: undefined,
       currentData: { grupo: {} },
@@ -191,13 +213,18 @@ export default {
     this.loadData()
   },
   methods: {
+    recibirCalificacion(data) {
+      this.currentData.calificacion = Object.assign({}, data)
+      this.$forceUpdate()
+    },
     changeType(data) {
+      this.currentData.calificacion=undefined
       if (data == 'estudiante') {
-        this.currentData.calificado={}
+        this.currentData.calificado = undefined
         this.findStudents()
       }
       if (data == 'equipo') {
-        this.currentData.calificado={}
+        this.currentData.calificado = undefined
         this.findTeams()
       }
     },
@@ -209,6 +236,7 @@ export default {
       }
     },
     async dialogCreateOpen() {
+      this.findActivities()
       this.currentData.grupo = Object.assign({}, this.selectedGroup)
       this.currentData.nombre = ''
       this.editing = false
@@ -220,7 +248,7 @@ export default {
       this.editing = true
     },
     saveData(data) {
-      let url = 'equipos/'
+      let url = 'calificaciones/'
       let token = this.$cookie.get(config.cookie.token)
       var options = {
         headers: { token: token }
@@ -238,7 +266,6 @@ export default {
               this.messageInfo = 'Se guardo correctamente'
               this.currentData = { grupo: {} }
               this.dialogInfo = true
-              this.findTeams()
             }
           })
           .catch(err => {
@@ -250,10 +277,22 @@ export default {
           })
         this.loading = false
       } else {
+        console.log(data);
         let dataNew = {
-          grupo: data.grupo.codigo,
-          nombre: data.nombre
+          actividad: data.actividad.id,
+          tipo: data.type,
+          grupo: this.selectedGroup.codigo,
+          nota: parseFloat(data.calificacion.totalNota).toFixed(2),
+          profesor: this.$cookie.get(config.cookie.usuario),
+          rubrica: data
         }
+        
+        if (data.type=="equipo"){
+          dataNew.calificado = data.calificado.codigo
+        }else{
+          dataNew.calificado=data.calificado.correo
+        }
+        
         this.$axios
           .post(url, dataNew, options)
           .then(async res => {
@@ -265,12 +304,13 @@ export default {
               this.currentData = { grupo: {} }
               this.dialogInfo = true
               this.editing = false
-              this.findTeams()
+              this.findGrades()
             }
           })
           .catch(err => {
             this.typeMessage = 'error'
             this.messageInfo = 'Hubo un error al guardar'
+            this.dialogInfo = true
           })
           .finally(() => {
             this.loading = false
@@ -338,7 +378,7 @@ export default {
      * Obtener calificaciones del grupo
      */
     async getAllData(team) {
-      let url = `${this.path}xgrupo/${team.codigo}`
+      let url = `${this.path}grupo/${team.codigo}`
       let token = this.$cookie.get(config.cookie.token)
       var options = {
         headers: { token: token }
@@ -365,7 +405,7 @@ export default {
       this.loading = false
       return response
     },
-     async findStudents() {
+    async findStudents() {
       let url = `grupos/estudiantes/${this.selectedGroup.codigo}/${this.selectedGroup.semestre}`
       let token = this.$cookie.get(config.cookie.token)
       var options = {
@@ -378,8 +418,8 @@ export default {
         this.aseleccionaracalificar = response.data
       }
     },
-     async findTeams() {
-      let url = `${this.path}xgrupo/${this.selectedGroup.codigo}`
+    async findTeams() {
+      let url = `equipos/xgrupo/${this.selectedGroup.codigo}`
       let token = this.$cookie.get(config.cookie.token)
       var options = {
         headers: { token: token }
@@ -391,6 +431,23 @@ export default {
         this.aseleccionaracalificar = data.data
       }
     },
+    async findActivities() {
+      let rol = this.$cookie.get(config.cookie.tipo)
+      let url = '/actividades'
+      if (rol != 'ADMINISTRADOR') {
+        url += '/creador/' + this.$cookie.get(config.cookie.usuario)
+      }
+      let token = this.$cookie.get(config.cookie.token)
+      var options = {
+        headers: { token: token }
+      }
+      this.loading = true
+      let response = await this.$axios.get(url, options)
+      this.loading = false
+      if (response.status == 200 && Array.isArray(response.data)) {
+        this.aseleccionaractividades = response.data
+      }
+    }
   }
 }
 </script>

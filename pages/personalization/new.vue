@@ -638,7 +638,6 @@ export default {
       } else {
         this.currentData.totalPorcentaje = total
       }
-
       this.$forceUpdate()
     },
     validarPorcentajes() {
@@ -666,7 +665,6 @@ export default {
         return false
       }
     },
-
     calcularTotalNivel(n) {
       for (let index = 0; index < array.length; index++) {
         const element = array[index]

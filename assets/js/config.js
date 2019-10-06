@@ -7,7 +7,6 @@ let config = {
     },
     routes:routes,
     menuLateral:[
-        
         {
             icon: 'dashboard',
             title: 'Plantillas Rúbrica',
@@ -49,6 +48,12 @@ let config = {
             title: 'Usuarios',
             to: routes.users,
             rol:'ADMINISTRADOR'
+        },
+        {
+            icon: 'assignment_turned_in',
+            title: 'Mis Calificaciones',
+            to: routes.mygrades,
+            rol:'ESTUDIANTE'
         }
           
     ],
