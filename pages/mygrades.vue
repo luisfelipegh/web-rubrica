@@ -48,7 +48,8 @@ export default {
         selectedGroup: undefined,
         grupos:[],
         headers: [
-        { text: 'Tipo', value: 'equipo' },
+        { text: 'Tipo', value: 'tipo' },
+        { text: 'Nombre', value: 'equipo' },
         { text: 'Actividad', value: 'actividad' },
         { text: 'Acciones', value: 'action', sortable: false }
       ],

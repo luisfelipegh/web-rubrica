@@ -12,7 +12,7 @@
       <v-card>
          <div id="printMe">
         <v-card-title class="headline">
-          Calificacion de {{base.tipo}}
+          Calificación de {{base.tipo}}
           <v-spacer></v-spacer>
         </v-card-title>
         <v-row>

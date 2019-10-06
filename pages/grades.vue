@@ -194,6 +194,7 @@ export default {
       headers: [
         { text: 'Tipo', value: 'tipo' },
         { text: 'Nombre', value: 'nombre' },
+        { text: 'Actividad', value: 'actividad' },
         { text: 'Acciones', value: 'action', sortable: false }
       ],
       items: [],
