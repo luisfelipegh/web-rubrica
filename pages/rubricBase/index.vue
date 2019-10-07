@@ -129,7 +129,6 @@ export default {
       dialogDelete: false,
       headers: [
         { text: 'Nombre', value: 'nombre' },
-        { text: 'Semetre', value: 'semestre' },
         { text: 'Usuario', value: 'nombre_creador' },
         { text: 'Acciones', value: 'action', sortable: false }
       ],

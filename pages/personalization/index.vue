@@ -166,7 +166,7 @@
                      <v-icon small class="pr-2" @click="edit(item)">edit</v-icon>
                     </v-btn>
                   </template>
-                  <span>Editar Rubrica</span>
+                  <span>Editar Rúbrica</span>
                 </v-tooltip>
                  <v-tooltip bottom>
                   <template v-slot:activator="{ on }">
@@ -174,7 +174,7 @@
                 <v-icon small @click="deleteItem(item)">delete</v-icon>
                     </v-btn>
                   </template>
-                  <span>Eliminar Grupo</span>
+                  <span>Eliminar Rúbrica</span>
                 </v-tooltip>
               </template>
               <template slot="no-data">No se encontraron Rúbricas</template>

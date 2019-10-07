@@ -49,8 +49,10 @@ export default {
         grupos:[],
         headers: [
         { text: 'Tipo', value: 'tipo' },
+        { text: 'Asignatura', value: 'nombre_grupo' },
         { text: 'Nombre', value: 'equipo' },
         { text: 'Actividad', value: 'actividad' },
+        { text: 'Nota', value: 'nota' },
         { text: 'Acciones', value: 'action', sortable: false }
       ],
     }
