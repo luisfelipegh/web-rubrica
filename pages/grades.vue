@@ -19,7 +19,7 @@
     </v-dialog>
     <v-dialog persistent v-model="dialogCreate" max-width="800">
       <v-card>
-        <v-card-title class="headline">Calificar</v-card-title>
+        <v-card-title class="headline">{{editing?'Editando ': 'Creando '}} Calificación</v-card-title>
         <div v-if="currentData!=undefined">
           <v-form v-model="valid" ref="formData" lazy-validation>
             <v-row class="px-5">
@@ -105,9 +105,15 @@
           <v-btn class="text-capitalize" outlined color="primary" rounded @click="cancelCreate()">
             <v-icon right>cancel</v-icon>Cancelar
           </v-btn>
-          <v-btn :disabled="currentData.calificacion==undefined" class="text-capitalize" color="primary" rounded @click="create()">
+          <v-btn
+            :disabled="currentData.calificacion==undefined"
+            class="text-capitalize"
+            color="primary"
+            rounded
+            @click="create()"
+          >
             <v-icon right>save</v-icon>
-            {{editing?'Guardar':'Crear'}}
+            {{editing?'Guardar Calificacion ':'Crear Calificacion'}}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -152,7 +158,15 @@
             <div v-if="selectedGroup!=undefined">
               <v-data-table :loading="loading" :headers="headers" :items="items">
                 <template v-slot:item.action="{ item }">
-                        <gradeView :base="item"/>
+                  <gradeView :base="item" />
+                  <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                      <v-btn icon v-on="on">
+                        <v-icon small @click="editItem(item)">edit</v-icon>
+                      </v-btn>
+                    </template>
+                    <span>Editar Calificación</span>
+                  </v-tooltip>
                   <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
                       <v-btn icon v-on="on">
@@ -179,7 +193,7 @@ import grade from '@/components/gradeBasePersonalized'
 import gradeView from '@/components/grade'
 
 export default {
-  components: { loading, grade ,gradeView},
+  components: { loading, grade, gradeView },
   data() {
     return {
       nameRules: [v => !!v || 'Campo requerido'],
@@ -192,9 +206,11 @@ export default {
       config: config,
       dialogDelete: false,
       headers: [
+        { text: 'Fecha', value: 'fecha' },
         { text: 'Tipo', value: 'tipo' },
         { text: 'Nombre', value: 'nombre' },
         { text: 'Actividad', value: 'actividad' },
+        { text: 'Nota', value: 'nota' },
         { text: 'Acciones', value: 'action', sortable: false }
       ],
       items: [],
@@ -219,7 +235,7 @@ export default {
       this.$forceUpdate()
     },
     changeType(data) {
-      this.currentData.calificacion=undefined
+      this.currentData.calificacion = undefined
       if (data == 'estudiante') {
         this.currentData.calificado = undefined
         this.findStudents()
@@ -244,7 +260,11 @@ export default {
       this.dialogCreate = true
     },
     editItem(item) {
-      this.currentData = Object.assign({}, item)
+      this.findActivities()
+      this.changeType(item.rubrica.type)
+      this.currentData = Object.assign({}, item.rubrica)
+      this.currentData.id = item.id
+      this.$forceUpdate()
       this.dialogCreate = true
       this.editing = true
     },
@@ -256,9 +276,17 @@ export default {
       }
       this.loading = true
       if (this.editing) {
-        url += data.grupo + '/' + data.codigo
+        let dataNew = {
+          actividad: data.actividad.id,
+          tipo: data.type,
+          grupo: this.selectedGroup.codigo,
+          nota: parseFloat(data.calificacion.totalNota).toFixed(2),
+          profesor: this.$cookie.get(config.cookie.usuario),
+          rubrica: data
+        }
+        url += '/' + data.id
         this.$axios
-          .put(url, data, options)
+          .put(url, dataNew, options)
           .then(async res => {
             let data = res
             if (data.status == 200) {
@@ -267,6 +295,7 @@ export default {
               this.messageInfo = 'Se guardo correctamente'
               this.currentData = { grupo: {} }
               this.dialogInfo = true
+              this.findGrades()
             }
           })
           .catch(err => {
@@ -278,7 +307,6 @@ export default {
           })
         this.loading = false
       } else {
-        console.log(data);
         let dataNew = {
           actividad: data.actividad.id,
           tipo: data.type,
@@ -287,13 +315,13 @@ export default {
           profesor: this.$cookie.get(config.cookie.usuario),
           rubrica: data
         }
-        
-        if (data.type=="equipo"){
+
+        if (data.type == 'equipo') {
           dataNew.calificado = data.calificado.codigo
-        }else{
-          dataNew.calificado=data.calificado.correo
+        } else {
+          dataNew.calificado = data.calificado.correo
         }
-        
+
         this.$axios
           .post(url, dataNew, options)
           .then(async res => {
@@ -329,6 +357,7 @@ export default {
       }
     },
     cancelCreate() {
+      this.currentData = { grupo: {} }
       this.dialogCreate = false
     },
     deleteItem(item) {
@@ -336,7 +365,7 @@ export default {
       this.toDelete = item
     },
     confirmDelete() {
-      let url = `${this.path}${this.toDelete.grupo}/${this.toDelete.codigo}`
+      let url = `${this.path}${this.toDelete.id}`
       let token = this.$cookie.get(config.cookie.token)
       var options = {
         headers: { token: token }
@@ -350,13 +379,13 @@ export default {
             this.dialogDelete = false
             this.dialogInfo = true
             this.messageInfo = 'Eliminado Correctamente'
-            this.findTeams()
+            this.findGrades()
           }
         })
         .catch(err => {
           this.dialogDelete = false
           this.dialogInfo = true
-          this.messageInfo = 'Verifica que no hayan estudiantes en el equipo'
+          this.messageInfo = 'Hubo un error eliminando'
         })
         .finally(() => {
           this.loading = false
@@ -394,7 +423,7 @@ export default {
      */
     async getAllDataGrupos() {
       let url = 'grupos/'
-      if (this.$cookie.get(config.cookie.tipo) == 'PROFESOR') {
+      if (this.$cookie.get(config.cookie.tipo) != 'ADMINISTRADOR') {
         url += 'profesor/' + this.$cookie.get(config.cookie.usuario)
       }
       let token = this.$cookie.get(config.cookie.token)
